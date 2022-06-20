@@ -3,9 +3,10 @@
 # To modify the layout, see https://jekyllrb.com/docs/themes/#overriding-theme-defaults
 
 layout: home
+list_title: Статьи
 ---
 
-# Сайт проекта «Электронная партитура»
+# Проект «Электронная партитура»
 
 Создание универсального стандарта нотной записи электронной музыки современной акадмической традиции.
 
