@@ -22,7 +22,7 @@ title: Электронная партитура
 email: sadikov.eldar@gmail.com
 description: >- # this means to ignore newlines until "baseurl:"
   Сайт проекта «Электронная партитура». 
-  Создание универсального стандарта нотной записи электронной музыки современной акадмической традиции
+  Дневник разработки универсального стандарта масштабируемых и анимируемых партитур электронной, электроакустической и инструментальной академической музыки
 baseurl: "/electronic-score" # the subpath of your site, e.g. /blog
 url: "" # the base hostname & protocol for your site, e.g. http://example.com
 # twitter_username: jekyllrb
@@ -32,6 +32,9 @@ github_username: eldarsadykov
 theme: minima
 plugins:
   - jekyll-feed
+
+minima:
+  date_format: "%d.%m.%Y"
 
 # Exclude from processing.
 # The following items will not be processed, by default.
