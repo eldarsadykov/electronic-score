@@ -6,7 +6,7 @@ permalink: /resources/
 
 Текущая версия разработки доступна на <a href="https://github.com/eldarsadykov/electronic-score">GitHub</a>.
 
-Пример статичной электронной партитуры:
+<!-- Пример статичной электронной партитуры:
 
 <svg xmlns="http://www.w3.org/2000/svg" xml:space="preserve" fill-rule="evenodd" stroke-linejoin="round" stroke-miterlimit="2" clip-rule="evenodd" viewBox="0 0 1654 1583">
   <g transform="scale(.66667 1.7631)">
@@ -37,4 +37,4 @@ permalink: /resources/
       </g>
     </g>
   </g>
-</svg>
+</svg> -->
