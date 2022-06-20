@@ -1,7 +1,7 @@
 ---
 layout: post
 title: "Анимированные партитуры"
-date: 2022-06-19 23:00:00 +0300
+date: 2022-06-20 04:00:00 +0300
 categories: blog
 permalink: animated-scores.html
 ---
