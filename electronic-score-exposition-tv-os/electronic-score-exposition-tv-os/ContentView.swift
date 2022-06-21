@@ -5,8 +5,40 @@
 //  Created by Эльдар Садыков on 20.06.2022.
 //
 
-import SwiftUI
 
+import SwiftUI
+import AudioKit
+//import DunneAudioKit
+import Soundpipe
+import Sporth
+import AVFoundation
+import SoundpipeAudioKit
+
+class OscillatorObject {
+    var engine = AudioEngine()
+
+    var osc = Oscillator()
+
+    init() {
+        engine.output = osc
+
+    }
+    func start(){
+        osc.frequency = 440;
+        osc.amplitude = 1.0;
+
+        do {
+            try engine.start()
+        } catch let err {
+            Log(err)
+        }
+        osc.start()
+    }
+    func stop (){
+        osc.stop()
+        engine.stop()
+    }
+}
 
 struct ContentView: View {
     struct Triangle: Shape {
@@ -27,17 +59,25 @@ struct ContentView: View {
         }
     }
     
+    var oscobj = OscillatorObject()
+    
     var body: some View {
         VStack{
             Triangle()
                 .stroke(lineWidth: 3)
                 .padding()
+                .onAppear(){
+                    oscobj.start()
+                }
+                .onDisappear(){
+                    oscobj.stop()
+                }
             //.rotationEffect(Angle(degrees: 270))
-            //.frame(width: 300, height: 200)
+            .frame(width: 300, height: 200)
             
             
         }
-
+        
     }
 }
 

@@ -5,7 +5,9 @@
 //  Created by Эльдар Садыков on 20.06.2022.
 //
 
+
 import SwiftUI
+import AudioKit
 
 @main
 struct electronic_score_exposition_tv_osApp: App {
