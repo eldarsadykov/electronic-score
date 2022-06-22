@@ -14,8 +14,10 @@ import Sporth
 import AVFoundation
 import SoundpipeAudioKit
 
+var engine = AudioEngine()
+
 class OscillatorObject {
-    var engine = AudioEngine()
+    
     
     var osc = FMOscillator()
     
@@ -61,7 +63,25 @@ class OscillatorObject {
 }
 
 struct ContentView: View {
+    struct Grid: Shape {
+        func path(in rect: CGRect) -> Path {
+            var path = Path()
+            let minX = rect.minX
+            let minY = rect.minY
+            let maxX = rect.maxX
+            let maxY = rect.maxY
+            for i in 0...12 {
+                path.move(to:CGPoint(x: maxX*CGFloat(i)/12, y: minY))
+                path.addLine(to:CGPoint(x: maxX*CGFloat(i)/12, y: maxY))
+                path.move(to:CGPoint(x: minX, y: maxY*CGFloat(i)/12))
+                path.addLine(to:CGPoint(x: maxX, y: maxY*CGFloat(i)/12))
+            }
+            return path
+        }
+        
+    }
     struct Triangle: InsettableShape {
+        let x1: Double, y1: Double, x2: Double,y2: Double, x3: Double, y3: Double
         var insetAmount = 0.0
         func path(in rect: CGRect) -> Path {
             var path = Path()
@@ -69,10 +89,9 @@ struct ContentView: View {
             let minY = rect.minY+insetAmount
             let maxX = rect.maxX-insetAmount
             let maxY = rect.maxY-insetAmount
-            path.move(to: CGPoint(x: (minX+0.5*maxX), y: minY))
-            path.addLine(to: CGPoint(x: minX, y: maxY*0.5))
-            path.addLine(to: CGPoint(x: maxX, y: maxY))
-//            path.addLine(to: CGPoint(x: (minX+0.5*maxX), y: minY))
+            path.move(to: CGPoint(x: (minX+x1*maxX/12), y: minY+y1*maxY/12))
+            path.addLine(to: CGPoint(x: (minX+x2*maxX/12), y: minY+y2*maxY/12))
+            path.addLine(to: CGPoint(x: (minX+x3*maxX/12), y: minY+y3*maxY/12))
             path.closeSubpath()
             return path
         }
@@ -91,23 +110,26 @@ struct ContentView: View {
         VStack{
             GeometryReader {geometry in
                 ZStack{
-                    Rectangle()
-                        .strokeBorder(Color.gray, lineWidth: baseWidth)
+                    Grid()
+                        .stroke(Color.gray, lineWidth: baseWidth)
                         .opacity(0.5)
-
-                    Triangle()
-                        .strokeBorder(Color.white,
-                                style: StrokeStyle(
-                                    lineWidth: baseWidth*2,
-                                    lineJoin: .round
-                                ))
+                    //                    Rectangle()
+                    //                        .strokeBorder(Color.gray, lineWidth: baseWidth)
+                    //                        .opacity(0.5)
+                    
+                    Triangle(x1: 0, y1: 0, x2: 6, y2: 6, x3:12, y3:0)
+                        .strokeBorder(Color.black,
+                                      style: StrokeStyle(
+                                        lineWidth: baseWidth*2,
+                                        lineJoin: .round
+                                      ))
                         .onAppear(){
                             oscobj.start()
                         }
                         .onDisappear(){
                             oscobj.stop()
                         }
-
+                    
                     TimelineView(.animation) { context in
                         let time = context.date.timeIntervalSinceReferenceDate
                         let divider: TimeInterval = 20;
@@ -115,9 +137,9 @@ struct ContentView: View {
                         //                    Text("\(moduloTime)")
                         let offset = geometry.size.width*((remainder-divider/2)/divider);
                         Rectangle()
-                            .foregroundColor(/*@START_MENU_TOKEN@*/Color.blue/*@END_MENU_TOKEN@*/)
+                            .foregroundColor(Color.red)
                             .offset(x: offset)
-                            .frame(width: baseWidth*5)
+                            .frame(width: baseWidth*4)
                             .opacity(0.5)
                     }
                 }
@@ -138,13 +160,16 @@ struct ContentView: View {
                     Button("Off") {
                         oscobj.off()
                     }
-
+                    
                 }
-
+                
             }
         }
+        .background(Color.white)
+        //        .frame(minWidth: 1920, maxWidth: .infinity, minHeight: 1080, maxHeight: .infinity)
         
     }
+    
 }
 
 struct ContentView_Previews: PreviewProvider {
