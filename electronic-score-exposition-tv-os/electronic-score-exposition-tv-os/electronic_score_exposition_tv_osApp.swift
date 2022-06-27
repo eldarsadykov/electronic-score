@@ -7,7 +7,6 @@
 
 
 import SwiftUI
-import AudioKit
 
 @main
 struct electronic_score_exposition_tv_osApp: App {

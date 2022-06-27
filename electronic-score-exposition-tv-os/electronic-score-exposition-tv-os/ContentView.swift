@@ -101,9 +101,6 @@ struct ContentView: View {
             return arc
         }
     }
-    
-    
-    
     var oscobj = OscillatorObject()
     let baseWidth = 2.0
     var body: some View {
@@ -111,13 +108,12 @@ struct ContentView: View {
             GeometryReader {geometry in
                 ZStack{
                     Grid()
-                        .stroke(Color.gray, lineWidth: baseWidth)
-                        .opacity(0.5)
+                        .stroke(Color.black, lineWidth: baseWidth)
+                        .opacity(0.1)
                     //                    Rectangle()
                     //                        .strokeBorder(Color.gray, lineWidth: baseWidth)
                     //                        .opacity(0.5)
-                    
-                    Triangle(x1: 0, y1: 0, x2: 6, y2: 6, x3:12, y3:0)
+                    let triangle = Triangle(x1: 0, y1: 0, x2: 6, y2: 12, x3:12, y3:0)
                         .strokeBorder(Color.black,
                                       style: StrokeStyle(
                                         lineWidth: baseWidth*2,
@@ -129,7 +125,7 @@ struct ContentView: View {
                         .onDisappear(){
                             oscobj.stop()
                         }
-                    
+                    triangle
                     TimelineView(.animation) { context in
                         let time = context.date.timeIntervalSinceReferenceDate
                         let divider: TimeInterval = 20;
@@ -142,28 +138,31 @@ struct ContentView: View {
                             .frame(width: baseWidth*4)
                             .opacity(0.5)
                     }
+
                 }
             }
-            HStack{
-                VStack{
-                    Button("Up") {
-                        oscobj.rampUp()
-                    }
-                    Button("Down") {
-                        oscobj.rampDown()
-                    }
-                }
-                VStack{
-                    Button("On") {
-                        oscobj.on()
-                    }
-                    Button("Off") {
-                        oscobj.off()
-                    }
-                    
-                }
-                
-            }
+
+                .foregroundColor(Color.black)
+//            HStack{
+//                VStack{
+//                    Button("Up") {
+//                        oscobj.rampUp()
+//                    }
+//                    Button("Down") {
+//                        oscobj.rampDown()
+//                    }
+//                }
+//                VStack{
+//                    Button("On") {
+//                        oscobj.on()
+//                    }
+//                    Button("Off") {
+//                        oscobj.off()
+//                    }
+//
+//                }
+//
+//            }
         }
         .background(Color.white)
         //        .frame(minWidth: 1920, maxWidth: .infinity, minHeight: 1080, maxHeight: .infinity)
