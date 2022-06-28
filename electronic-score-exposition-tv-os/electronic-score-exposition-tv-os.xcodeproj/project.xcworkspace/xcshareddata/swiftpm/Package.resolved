@@ -3,7 +3,7 @@
     {
       "identity" : "audiokit",
       "kind" : "remoteSourceControl",
-      "location" : "https://github.com/AudioKit/AudioKit.git",
+      "location" : "https://github.com/AudioKit/AudioKit",
       "state" : {
         "revision" : "576528c7618838ed3bdb967b4e176841994aa01d",
         "version" : "5.4.4"
@@ -30,7 +30,7 @@
     {
       "identity" : "soundpipeaudiokit",
       "kind" : "remoteSourceControl",
-      "location" : "https://github.com/AudioKit/SoundpipeAudioKit.git",
+      "location" : "https://github.com/AudioKit/SoundpipeAudioKit",
       "state" : {
         "revision" : "26465fb687d710aa99a8ec04b60a05c6665cd6ed",
         "version" : "5.4.2"
@@ -43,15 +43,6 @@
       "state" : {
         "revision" : "f60e798288dd3b12814e83a4fc62468629d8c1f2",
         "version" : "5.3.1"
-      }
-    },
-    {
-      "identity" : "stkaudiokit",
-      "kind" : "remoteSourceControl",
-      "location" : "https://github.com/AudioKit/STKAudioKit.git",
-      "state" : {
-        "revision" : "8a1685afad9b5e7e892f22a8411216a36e5bcb62",
-        "version" : "5.3.0"
       }
     }
   ],
