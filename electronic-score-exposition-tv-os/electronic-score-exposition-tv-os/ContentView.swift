@@ -62,6 +62,9 @@ class OscillatorObject {
 }
 
 struct ContentView: View {
+    @State var atEnd: Bool = false
+    @State var playStop: Bool = false
+
     struct Grid: Shape {
         func path(in rect: CGRect) -> Path {
             var path = Path()
@@ -76,37 +79,6 @@ struct ContentView: View {
                 path.addLine(to: CGPoint(x: maxX, y: maxY * CGFloat(i) / 12))
             }
             return path
-        }
-    }
-
-    struct LoginForm {
-        enum Field: Hashable {
-            case username
-            case password
-        }
-
-        @State private var username = ""
-        @State private var password = ""
-        @FocusState private var focusedField: Field?
-
-        var body: some View {
-            Form {
-                TextField("Username", text: $username)
-                    .focused($focusedField, equals: .username)
-
-                SecureField("Password", text: $password)
-                    .focused($focusedField, equals: .password)
-
-                Button("Sign In") {
-                    if username.isEmpty {
-                        focusedField = .username
-                    } else if password.isEmpty {
-                        focusedField = .password
-                    } else {
-                        handleLogin(username, password)
-                    }
-                }
-            }
         }
     }
 
@@ -135,6 +107,7 @@ struct ContentView: View {
 
     var oscobj = OscillatorObject()
     let baseWidth = 2.0
+
     var body: some View {
         VStack {
             GeometryReader { geometry in
@@ -145,7 +118,7 @@ struct ContentView: View {
                     //                    Rectangle()
                     //                        .strokeBorder(Color.gray, lineWidth: baseWidth)
                     //                        .opacity(0.5)
-                    let triangle = Triangle(x1: 0, y1: 0, x2: 6, y2: 12, x3: 12, y3: 0)
+                    Triangle(x1: 0, y1: 0, x2: 6, y2: 12, x3: 12, y3: 0)
                         .strokeBorder(Color.black,
                                       style: StrokeStyle(
                                           lineWidth: baseWidth * 2,
@@ -158,38 +131,49 @@ struct ContentView: View {
                             oscobj.stop()
                         }
                         .focusable()
-
-                    triangle
-                    TimelineView(.animation) { context in
-                        let time = context.date.timeIntervalSinceReferenceDate
-                        let divider: TimeInterval = 20
-                        let remainder = time.truncatingRemainder(dividingBy: divider)
-                        //                    Text("\(moduloTime)")
-                        let offset = geometry.size.width * ((remainder - divider / 2) / divider)
-                        Rectangle()
-                            .foregroundColor(Color.red)
-                            .offset(x: offset)
-                            .frame(width: baseWidth * 4)
-                            .opacity(0.5)
-                    }
+                    Rectangle()
+                        .foregroundColor(Color.red)
+                        .frame(width: baseWidth * 4)
+                        .offset(x: geometry.size.width * (atEnd ? 0.5 : -0.5))
+                        .opacity(0.5)
+//                    TimelineView(.animation) { context in
+//                        let time = context.date.timeIntervalSinceReferenceDate
+//                        let divider: TimeInterval = 20
+//                        let remainder = time.truncatingRemainder(dividingBy: divider)
+//                        //                    Text("\(moduloTime)")
+//                        let offset = geometry.size.width * ((remainder - divider / 2) / divider)
+//                        Rectangle()
+//                            .foregroundColor(Color.red)
+//                            .offset(x: offset)
+//                            .frame(width: baseWidth * 4)
+//                            .opacity(0.5)
+//                    }
                 }
             }
-
             .foregroundColor(Color.black)
             HStack {
-                Button("Up") {
-                    oscobj.rampUp()
-                }
-                Button("Down") {
-                    oscobj.rampDown()
-                }
+//                Button("Up") {
+//                    oscobj.rampUp()
+//                }
+//                Button("Down") {
+//                    oscobj.rampDown()
+//                }
 
-                Button("On") {
-                    oscobj.on()
+                Button(playStop ? "Stop" : "Play") {
+//                    oscobj.on()
+                    if atEnd {
+                        playStop = false
+                        atEnd = false
+                    } else {
+                        playStop = true
+                        withAnimation(.linear(duration: 5)) {
+                            atEnd = true
+                        }
+                    }
                 }
-                Button("Off") {
-                    oscobj.off()
-                }
+//                Button("Off") {
+//                    oscobj.off()
+//                }
             }
         }
         .background(Color.white)
