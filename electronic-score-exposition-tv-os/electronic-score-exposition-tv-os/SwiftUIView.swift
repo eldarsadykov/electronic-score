@@ -11,10 +11,10 @@ import CSporthAudioKit
 import Soundpipe
 import SoundpipeAudioKit
 import Sporth
+import SporthAudioKit
 import SwiftUI
 
-class SegmentOperationModifiedConductor: ObservableObject {
-    // let customTable = Table
+class BasicEventConductor: ObservableObject {
     let engine = AudioEngine()
     @Published var isRunning = false {
         didSet {
@@ -25,25 +25,39 @@ class SegmentOperationModifiedConductor: ObservableObject {
     let generator = OperationGenerator { parameters in
 
         let updateRate = parameters[0]
-        let x = Operation.lineSegment(trigger: Operation.metronome(frequency: updateRate),
-                                      start: 0,
-                                      end: 1,
-                                      duration: 0.5 / updateRate)
+//        let x = Operation.lineSegment(trigger: Operation.metronome(frequency: updateRate), start: 0.0, end: 1.0, duration: 1 / updateRate)
+        let x = Operation.phasor(frequency: updateRate, phase: 0.0)
         let frequency = 220.0
-        let x1 = 0.1
-        let y1 = 0.0
-        let x2 = 0.2
-        let y2 = 1.0
-        let x3 = 0.9
-        let y3 = 0.0
-        let rampUp = ((x - x1) * (y2 - y1) / max(x2 - x1, 0.05)) + y1
-        let rampDown = ((x - x2) * (y3 - y2) / max(x3 - x2, 0.05)) + y2
-        let amplitude = max(min(min(rampUp, rampDown), 1), 0)
+
+        let ms = 1000.0 / updateRate // total score time ms
+        let aMin = 5.0 // minimum attack time ms
+        let rMin = 20.0 // minimum release time ms
+
+        let x01 = 0.0 // note start time
+        let x02 = 1.0 // note peak time
+        let x03 = 1.0 // note end time
+
+        let d21 = min(0.5, aMin / ms) // safe attack period
+        let d32 = min(0.5, rMin / ms) // safe release period
+        let d31 = d21 + d32 // safeNoteLength
+
+        let x1 = max(0.0, min(x01, 1.0 - d31)) // protect start
+        let x3 = min(1.0, max(x03, x1 + d31)) // protect end
+        let x2 = x1 + min(x3 - d32, max(x02 - x1, d21)) // protect middle
+
+        let rampUp = (x - x1) / (x2 - x1)
+        let rampDown = 1 - (x - x2) / (x3 - x2)
+
+        let rampUpDown = min(rampUp, rampDown)
+        let topClip = min(rampUpDown, 1.0)
+        let bottomClip = max(topClip, 0.0)
+        let amplitude = bottomClip
+//        return Operation.triangle(frequency: frequency, amplitude: amplitude, phase: 0.0)
         return Operation.fmOscillator(baseFrequency: frequency, carrierMultiplier: 1, modulatingMultiplier: 1, modulationIndex: amplitude, amplitude: amplitude)
     }
 
     init() {
-        generator.parameter1 = 8
+        generator.parameter1 = 1
         engine.output = generator
     }
 
@@ -61,7 +75,7 @@ class SegmentOperationModifiedConductor: ObservableObject {
 }
 
 struct SwiftUIView: View {
-    @StateObject var conductor = SegmentOperationModifiedConductor()
+    @StateObject var conductor = BasicEventConductor()
 
     var body: some View {
         VStack(spacing: 20) {
