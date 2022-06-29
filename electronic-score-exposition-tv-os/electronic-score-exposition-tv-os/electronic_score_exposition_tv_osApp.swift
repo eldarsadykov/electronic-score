@@ -12,7 +12,7 @@ import SwiftUI
 struct electronic_score_exposition_tv_osApp: App {
     var body: some Scene {
         WindowGroup {
-            ContentView()
+            SwiftUIView()
         }
     }
 }
