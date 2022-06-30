@@ -15,6 +15,7 @@ import SporthAudioKit
 import SwiftUI
 
 class BasicEventConductor: ObservableObject {
+    let triangle = Triangle(x1: 0, y1: 0.5, x2: 0.5, y2: 1, x3: 1, y3: 0)
     let engine = AudioEngine()
     @Published var isRunning = false {
         didSet {
@@ -24,18 +25,15 @@ class BasicEventConductor: ObservableObject {
 
     let generator = OperationGenerator { parameters in
 
-        let updateRate = parameters[0]
-//        let x = Operation.lineSegment(trigger: Operation.metronome(frequency: updateRate), start: 0.0, end: 1.0, duration: 1 / updateRate)
-        let x = Operation.phasor(frequency: updateRate, phase: 0.0)
+        let ms = parameters[0] // total score time ms
+        let x = Operation.phasor(frequency: 1000 / ms, phase: 0.0)
         let frequency = 220.0
-
-        let ms = 1000.0 / updateRate // total score time ms
         let aMin = 5.0 // minimum attack time ms
-        let rMin = 20.0 // minimum release time ms
+        let rMin = 10.0 // minimum release time ms
 
-        let x01 = 0.0 // note start time
-        let x02 = 1.0 // note peak time
-        let x03 = 1.0 // note end time
+        let x01 = parameters[1] // note start time
+        let x02 = parameters[2] // note peak time
+        let x03 = parameters[3] // note end time
 
         let d21 = min(0.5, aMin / ms) // safe attack period
         let d32 = min(0.5, rMin / ms) // safe release period
@@ -52,12 +50,12 @@ class BasicEventConductor: ObservableObject {
         let topClip = min(rampUpDown, 1.0)
         let bottomClip = max(topClip, 0.0)
         let amplitude = bottomClip
-//        return Operation.triangle(frequency: frequency, amplitude: amplitude, phase: 0.0)
-        return Operation.fmOscillator(baseFrequency: frequency, carrierMultiplier: 1, modulatingMultiplier: 1, modulationIndex: amplitude, amplitude: amplitude)
+        
+        return Operation.fmOscillator(baseFrequency: frequency, carrierMultiplier: 1, modulatingMultiplier: 1, modulationIndex: amplitude*amplitude, amplitude: amplitude*amplitude)
     }
 
     init() {
-        generator.parameter1 = 1
+        generator.parameter1 = 10000
         engine.output = generator
     }
 
@@ -74,12 +72,35 @@ class BasicEventConductor: ObservableObject {
     }
 }
 
+struct Triangle: InsettableShape {
+    let x1: Double, y1: Double, x2: Double, y2: Double, x3: Double, y3: Double
+    var insetAmount = 0.0
+    func path(in rect: CGRect) -> Path {
+        var path = Path()
+        let minX = rect.minX + insetAmount
+        let minY = rect.minY + insetAmount
+        let maxX = rect.maxX - insetAmount * 2
+        let maxY = rect.maxY - insetAmount * 2
+        path.move(to: CGPoint(x: minX + x1 * maxX, y: minY + y1 * maxY))
+        path.addLine(to: CGPoint(x: minX + x2 * maxX, y: minY + y2 * maxY))
+        path.addLine(to: CGPoint(x: minX + x3 * maxX, y: minY + y3 * maxY))
+        path.closeSubpath()
+        return path
+    }
+
+    func inset(by amount: CGFloat) -> some InsettableShape {
+        var tri = self
+        tri.insetAmount += amount
+        return tri
+    }
+}
+
 struct SwiftUIView: View {
     @StateObject var conductor = BasicEventConductor()
 
     var body: some View {
         VStack(spacing: 20) {
-            Text("Creating segments that vary parameters in operations linearly or exponentially over a certain duration")
+            conductor.triangle
             Button(conductor.isRunning ? "Stop" : "Start") {
                 conductor.isRunning.toggle()
             }

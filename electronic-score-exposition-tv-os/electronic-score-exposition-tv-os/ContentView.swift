@@ -98,9 +98,9 @@ struct ContentView: View {
         }
 
         func inset(by amount: CGFloat) -> some InsettableShape {
-            var arc = self
-            arc.insetAmount += amount
-            return arc
+            var tri = self
+            tri.insetAmount += amount
+            return tri
         }
     }
 
