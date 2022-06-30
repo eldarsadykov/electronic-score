@@ -15,21 +15,25 @@ import SporthAudioKit
 import SwiftUI
 
 class BasicEventConductor: ObservableObject {
-    let triangle = Triangle(x1: 0, y1: 0.5, x2: 0.0, y2: 1, x3: 1, y3: 0)
+    let triangle1 = Triangle(x1: 0.0, y1: 1.0, x2: 0, y2: 0.0, x3: 1, y3: 0.5)
+    let triangle2 = Triangle(x1: 0.333333, y1: 0.0, x2: 0.6666666, y2: 1, x3: 1, y3: 0)
+
     let engine = AudioEngine()
     @Published var isRunning = false {
         didSet {
-            isRunning ? generator.start() : generator.stop()
+            isRunning ? generator1.start() : generator1.stop()
+            isRunning ? generator2.start() : generator2.stop()
         }
     }
 
-    let generator = OperationGenerator { parameters in
+    let generator1 = OperationGenerator { parameters in
 
         let ms = parameters[0] // total score time ms
         let x = Operation.phasor(frequency: 1000 / ms, phase: 0.0)
-        let frequency = 220.0
+        let midiNote = parameters[4] * 12 + 48
+        let frequency = midiNote.midiNoteToFrequency()
         let aMin = 5.0 // minimum attack time ms
-        let rMin = 10.0 // minimum release time ms
+        let rMin = 5.0 // minimum release time ms
 
         let x01 = parameters[1] // note start time
         let x02 = parameters[2] // note peak time
@@ -49,19 +53,59 @@ class BasicEventConductor: ObservableObject {
         let rampUpDown = min(rampUp, rampDown)
         let topClip = min(rampUpDown, 1.0)
         let bottomClip = max(topClip, 0.0)
-        let amplitude = bottomClip
-        
-        return Operation.fmOscillator(baseFrequency: frequency, carrierMultiplier: 1, modulatingMultiplier: 1, modulationIndex: amplitude*amplitude, amplitude: amplitude*amplitude)
+        let amplitude = bottomClip * 0.25
+
+        return Operation.fmOscillator(baseFrequency: frequency, carrierMultiplier: 1, modulatingMultiplier: 1, modulationIndex: amplitude, amplitude: amplitude)
+    }
+
+    let generator2 = OperationGenerator { parameters in
+
+        let ms = parameters[0] // total score time ms
+        let x = Operation.phasor(frequency: 1000 / ms, phase: 0.0)
+        let midiNote = parameters[4] * 12 + 48
+        let frequency = midiNote.midiNoteToFrequency()
+        let aMin = 5.0 // minimum attack time ms
+        let rMin = 5.0 // minimum release time ms
+
+        let x01 = parameters[1] // note start time
+        let x02 = parameters[2] // note peak time
+        let x03 = parameters[3] // note end time
+
+        let d21 = min(0.5, aMin / ms) // safe attack period
+        let d32 = min(0.5, rMin / ms) // safe release period
+        let d31 = d21 + d32 // safeNoteLength
+
+        let x1 = max(0.0, min(x01, 1.0 - d31)) // protect start
+        let x3 = min(1.0, max(x03, x1 + d31)) // protect end
+        let x2 = x1 + min(x3 - d32, max(x02 - x1, d21)) // protect middle
+
+        let rampUp = (x - x1) / (x2 - x1)
+        let rampDown = 1 - (x - x2) / (x3 - x2)
+
+        let rampUpDown = min(rampUp, rampDown)
+        let topClip = min(rampUpDown, 1.0)
+        let bottomClip = max(topClip, 0.0)
+        let amplitude = bottomClip * 0.25
+
+        return Operation.fmOscillator(baseFrequency: frequency, carrierMultiplier: 1, modulatingMultiplier: 1, modulationIndex: amplitude, amplitude: amplitude)
     }
 
     init() {
-        generator.parameter1 = 1000
-        
-        generator.parameter2 = AUValue(triangle.x1)
-        generator.parameter3 = AUValue(triangle.x2)
-        generator.parameter4 = AUValue(triangle.x3)
-        
-        engine.output = generator
+        generator1.parameter1 = 5000
+
+        generator1.parameter2 = AUValue(triangle1.x1)
+        generator1.parameter3 = AUValue(triangle1.x2)
+        generator1.parameter4 = AUValue(triangle1.x3)
+        generator1.parameter5 = AUValue(triangle1.y1)
+
+        generator2.parameter1 = 5000
+
+        generator2.parameter2 = AUValue(triangle2.x1)
+        generator2.parameter3 = AUValue(triangle2.x2)
+        generator2.parameter4 = AUValue(triangle2.x3)
+        generator2.parameter5 = AUValue(triangle2.y1)
+
+        engine.output = Mixer(generator1, generator2)
     }
 
     func start() {
@@ -74,6 +118,15 @@ class BasicEventConductor: ObservableObject {
 
     func stop() {
         engine.stop()
+    }
+}
+
+struct Playhead: Shape {
+    func path(in rect: CGRect) -> Path {
+        var path = Path()
+        path.move(to: CGPoint(x: rect.midX, y: rect.minY))
+        path.addLine(to: CGPoint(x: rect.midX, y: rect.maxY))
+        return path
     }
 }
 
@@ -101,13 +154,53 @@ struct Triangle: InsettableShape {
 }
 
 struct SwiftUIView: View {
+    @State var atEnd = false
+    struct Grid: Shape {
+        func path(in rect: CGRect) -> Path {
+            var path = Path()
+            let minX = rect.minX
+            let minY = rect.minY
+            let maxX = rect.maxX
+            let maxY = rect.maxY
+            for i in 0 ... 12 {
+                path.move(to: CGPoint(x: maxX * CGFloat(i) / 12, y: minY))
+                path.addLine(to: CGPoint(x: maxX * CGFloat(i) / 12, y: maxY))
+                path.move(to: CGPoint(x: minX, y: maxY * CGFloat(i) / 12))
+                path.addLine(to: CGPoint(x: maxX, y: maxY * CGFloat(i) / 12))
+            }
+            return path
+        }
+    }
+
     @StateObject var conductor = BasicEventConductor()
 
     var body: some View {
         VStack(spacing: 20) {
-            conductor.triangle
-            Button(conductor.isRunning ? "Stop" : "Start") {
-                conductor.isRunning.toggle()
+            GeometryReader { geometry in
+                ZStack {
+                    Grid()
+                        .stroke(lineWidth: 2)
+                        .opacity(0.25)
+                    conductor.triangle1
+                        .stroke(style: StrokeStyle(lineWidth: 4, lineCap: .round, lineJoin: .round))
+
+                    conductor.triangle2
+                        .stroke(style: StrokeStyle(lineWidth: 4, lineCap: .round, lineJoin: .round))
+
+                    Playhead()
+                        .stroke(style: StrokeStyle(lineWidth: 8, lineCap: .round))
+                        .foregroundColor(Color.red)
+                        .offset(x: geometry.size.width * (conductor.isRunning ? 0.5 : -0.5))
+                        .opacity(0.5)
+
+                        .animation(Animation.linear(duration: 5).repeatForever(autoreverses: false), value: conductor.isRunning)
+                }
+                .onAppear {
+                    conductor.isRunning.toggle()
+                }
+//                Button(conductor.isRunning ? "Stop" : "Start") {
+//                    conductor.isRunning.toggle()
+//                }
             }
         }
         .padding()
