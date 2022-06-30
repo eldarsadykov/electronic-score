@@ -15,7 +15,7 @@ import SporthAudioKit
 import SwiftUI
 
 class BasicEventConductor: ObservableObject {
-    let triangle = Triangle(x1: 0, y1: 0.5, x2: 0.5, y2: 1, x3: 1, y3: 0)
+    let triangle = Triangle(x1: 0, y1: 0.5, x2: 0.0, y2: 1, x3: 1, y3: 0)
     let engine = AudioEngine()
     @Published var isRunning = false {
         didSet {
@@ -55,7 +55,12 @@ class BasicEventConductor: ObservableObject {
     }
 
     init() {
-        generator.parameter1 = 10000
+        generator.parameter1 = 1000
+        
+        generator.parameter2 = AUValue(triangle.x1)
+        generator.parameter3 = AUValue(triangle.x2)
+        generator.parameter4 = AUValue(triangle.x3)
+        
         engine.output = generator
     }
 
