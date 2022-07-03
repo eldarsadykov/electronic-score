@@ -15,97 +15,78 @@ import SporthAudioKit
 import SwiftUI
 
 class BasicEventConductor: ObservableObject {
-    let triangle1 = Triangle(x1: 0.0, y1: 1.0, x2: 0, y2: 0.0, x3: 1, y3: 0.5)
-    let triangle2 = Triangle(x1: 0.333333, y1: 0.0, x2: 0.6666666, y2: 1, x3: 1, y3: 0)
+    let ms = 6000.0
+    let triangle1 = Triangle(x1: 0.25, y1: 0.25, x2: 1, y2: 1, x3: 1, y3: 0)
+    let triangle2 = Triangle(x1: 0.0, y1: 1, x2: 1, y2: 1, x3: 1, y3: 0)
 
     let engine = AudioEngine()
     @Published var isRunning = false {
         didSet {
-            isRunning ? generator1.start() : generator1.stop()
-            isRunning ? generator2.start() : generator2.stop()
+            isRunning ? mainPhasor.start() : mainPhasor.stop()
         }
     }
 
-    let generator1 = OperationGenerator { parameters in
-
-        let ms = parameters[0] // total score time ms
-        let x = Operation.phasor(frequency: 1000 / ms, phase: 0.0)
-        let midiNote = parameters[4] * 12 + 48
-        let frequency = midiNote.midiNoteToFrequency()
-        let aMin = 5.0 // minimum attack time ms
-        let rMin = 5.0 // minimum release time ms
-
-        let x01 = parameters[1] // note start time
-        let x02 = parameters[2] // note peak time
-        let x03 = parameters[3] // note end time
-
-        let d21 = min(0.5, aMin / ms) // safe attack period
-        let d32 = min(0.5, rMin / ms) // safe release period
-        let d31 = d21 + d32 // safeNoteLength
-
-        let x1 = max(0.0, min(x01, 1.0 - d31)) // protect start
-        let x3 = min(1.0, max(x03, x1 + d31)) // protect end
-        let x2 = x1 + min(x3 - d32, max(x02 - x1, d21)) // protect middle
-
-        let rampUp = (x - x1) / (x2 - x1)
-        let rampDown = 1 - (x - x2) / (x3 - x2)
-
-        let rampUpDown = min(rampUp, rampDown)
-        let topClip = min(rampUpDown, 1.0)
-        let bottomClip = max(topClip, 0.0)
-        let amplitude = bottomClip * 0.25
-
-        return Operation.fmOscillator(baseFrequency: frequency, carrierMultiplier: 1, modulatingMultiplier: 1, modulationIndex: amplitude, amplitude: amplitude)
-    }
-
-    let generator2 = OperationGenerator { parameters in
-
-        let ms = parameters[0] // total score time ms
-        let x = Operation.phasor(frequency: 1000 / ms, phase: 0.0)
-        let midiNote = parameters[4] * 12 + 48
-        let frequency = midiNote.midiNoteToFrequency()
-        let aMin = 5.0 // minimum attack time ms
-        let rMin = 5.0 // minimum release time ms
-
-        let x01 = parameters[1] // note start time
-        let x02 = parameters[2] // note peak time
-        let x03 = parameters[3] // note end time
-
-        let d21 = min(0.5, aMin / ms) // safe attack period
-        let d32 = min(0.5, rMin / ms) // safe release period
-        let d31 = d21 + d32 // safeNoteLength
-
-        let x1 = max(0.0, min(x01, 1.0 - d31)) // protect start
-        let x3 = min(1.0, max(x03, x1 + d31)) // protect end
-        let x2 = x1 + min(x3 - d32, max(x02 - x1, d21)) // protect middle
-
-        let rampUp = (x - x1) / (x2 - x1)
-        let rampDown = 1 - (x - x2) / (x3 - x2)
-
-        let rampUpDown = min(rampUp, rampDown)
-        let topClip = min(rampUpDown, 1.0)
-        let bottomClip = max(topClip, 0.0)
-        let amplitude = bottomClip * 0.25
-
-        return Operation.fmOscillator(baseFrequency: frequency, carrierMultiplier: 1, modulatingMultiplier: 1, modulationIndex: amplitude, amplitude: amplitude)
-    }
+    let mainPhasor: OperationGenerator
+    let sound1: OperationEffect
+    let sound2: OperationEffect
 
     init() {
-        generator1.parameter1 = 5000
+        mainPhasor = OperationGenerator { parameters in
+            let ms = parameters[0] // total score time ms
+            return Operation.phasor(frequency: 1000 / ms, phase: 0.0)
+        }
 
-        generator1.parameter2 = AUValue(triangle1.x1)
-        generator1.parameter3 = AUValue(triangle1.x2)
-        generator1.parameter4 = AUValue(triangle1.x3)
-        generator1.parameter5 = AUValue(triangle1.y1)
+        func createSound(input: OperationGenerator) -> OperationEffect {
+            let sound = OperationEffect(input) { input, parameters in
+                let ms = parameters[0]
+                let x = input / 2
+                let midiNote = parameters[4] * 12 + 48
+                let frequency = midiNote.midiNoteToFrequency()
+                let aMin = 10.0 // minimum attack time ms
+                let rMin = 10.0 // minimum release time ms
 
-        generator2.parameter1 = 5000
+                let x01 = parameters[1] // note start time
+                let x02 = parameters[2] // note peak time
+                let x03 = parameters[3] // note end time
 
-        generator2.parameter2 = AUValue(triangle2.x1)
-        generator2.parameter3 = AUValue(triangle2.x2)
-        generator2.parameter4 = AUValue(triangle2.x3)
-        generator2.parameter5 = AUValue(triangle2.y1)
+                let d21 = min(0.5, aMin / ms) // safe attack period
+                let d32 = min(0.5, rMin / ms) // safe release period
+                let d31 = d21 + d32 // safeNoteLength
 
-        engine.output = Mixer(generator1, generator2)
+                let x1 = max(0.0, min(x01, 1.0 - d31)) // protect start
+                let x3 = min(1.0, max(x03, x1 + d31)) // protect end
+                let x2 = x1 + min(x3 - x1 - d32, max(x02 - x1, d21)) // protect middle
+
+                let rampUp = (x - x1) / (x2 - x1)
+                let rampDown = 1 - (x - x2) / (x3 - x2)
+
+                let rampUpDown = min(rampUp, rampDown)
+                let topClip = min(rampUpDown, 1.0)
+                let bottomClip = max(topClip, 0.0)
+                let amplitude = bottomClip * 0.25
+
+                return Operation.fmOscillator(baseFrequency: frequency, carrierMultiplier: 1, modulatingMultiplier: 1, modulationIndex: amplitude, amplitude: amplitude * amplitude)
+            }
+            return sound
+        }
+
+        sound1 = createSound(input: mainPhasor)
+        sound2 = createSound(input: mainPhasor)
+
+        mainPhasor.parameter1 = AUValue(ms)
+        sound1.parameter1 = AUValue(ms)
+        sound1.parameter2 = AUValue(triangle1.x1)
+        sound1.parameter3 = AUValue(triangle1.x2)
+        sound1.parameter4 = AUValue(triangle1.x3)
+        sound1.parameter5 = AUValue(triangle1.y1)
+
+        sound2.parameter1 = AUValue(ms)
+        sound2.parameter2 = AUValue(triangle2.x1)
+        sound2.parameter3 = AUValue(triangle2.x2)
+        sound2.parameter4 = AUValue(triangle2.x3)
+        sound2.parameter5 = AUValue(triangle2.y1)
+
+        engine.output = Mixer(sound1, sound2)
     }
 
     func start() {
@@ -136,12 +117,12 @@ struct Triangle: InsettableShape {
     func path(in rect: CGRect) -> Path {
         var path = Path()
         let minX = rect.minX + insetAmount
-        let minY = rect.minY + insetAmount
+//        let minY = rect.minY + insetAmount
         let maxX = rect.maxX - insetAmount * 2
         let maxY = rect.maxY - insetAmount * 2
-        path.move(to: CGPoint(x: minX + x1 * maxX, y: minY + y1 * maxY))
-        path.addLine(to: CGPoint(x: minX + x2 * maxX, y: minY + y2 * maxY))
-        path.addLine(to: CGPoint(x: minX + x3 * maxX, y: minY + y3 * maxY))
+        path.move(to: CGPoint(x: minX + x1 * maxX, y: maxY - y1 * maxY))
+        path.addLine(to: CGPoint(x: minX + x2 * maxX, y: maxY - y2 * maxY))
+        path.addLine(to: CGPoint(x: minX + x3 * maxX, y: maxY - y3 * maxY))
         path.closeSubpath()
         return path
     }
@@ -188,12 +169,12 @@ struct SwiftUIView: View {
                         .stroke(style: StrokeStyle(lineWidth: 4, lineCap: .round, lineJoin: .round))
 
                     Playhead()
-                        .stroke(style: StrokeStyle(lineWidth: 8, lineCap: .round))
+                        .stroke(style: StrokeStyle(lineWidth: 8, lineCap: .butt))
                         .foregroundColor(Color.red)
                         .offset(x: geometry.size.width * (conductor.isRunning ? 0.5 : -0.5))
                         .opacity(0.5)
 
-                        .animation(Animation.linear(duration: 5).repeatForever(autoreverses: false), value: conductor.isRunning)
+                        .animation(Animation.linear(duration: conductor.ms / 1000.0).repeatForever(autoreverses: false), value: conductor.isRunning)
                 }
                 .onAppear {
                     conductor.isRunning.toggle()

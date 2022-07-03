@@ -10,7 +10,7 @@
 		}
 ,
 		"classnamespace" : "dsp.gen",
-		"rect" : [ 1314.0, 87.0, 1212.0, 1319.0 ],
+		"rect" : [ 874.0, 86.0, 772.0, 929.0 ],
 		"bglocked" : 0,
 		"openinpresentation" : 0,
 		"default_fontsize" : 12.0,
@@ -40,6 +40,39 @@
 		"assistshowspatchername" : 0,
 		"boxes" : [ 			{
 				"box" : 				{
+					"id" : "obj-7",
+					"maxclass" : "newobj",
+					"numinlets" : 1,
+					"numoutlets" : 0,
+					"patching_rect" : [ 488.0, 576.0, 35.0, 22.0 ],
+					"text" : "out 4"
+				}
+
+			}
+, 			{
+				"box" : 				{
+					"id" : "obj-6",
+					"maxclass" : "newobj",
+					"numinlets" : 1,
+					"numoutlets" : 0,
+					"patching_rect" : [ 342.0, 576.0, 35.0, 22.0 ],
+					"text" : "out 3"
+				}
+
+			}
+, 			{
+				"box" : 				{
+					"id" : "obj-3",
+					"maxclass" : "newobj",
+					"numinlets" : 1,
+					"numoutlets" : 0,
+					"patching_rect" : [ 196.0, 576.0, 35.0, 22.0 ],
+					"text" : "out 2"
+				}
+
+			}
+, 			{
+				"box" : 				{
 					"id" : "obj-2",
 					"maxclass" : "newobj",
 					"numinlets" : 0,
@@ -52,15 +85,15 @@
 			}
 , 			{
 				"box" : 				{
-					"code" : "x = in1; // current phase (0-1)\r\n\r\naMin = 5; // minimum attack time ms\r\nrMin = 20; // minimum release time ms\r\n\r\nx01 = 0.0; // note start time \r\nx02 = 0.0; // note peak time\r\nx03 = 1.0; // note end time\r\n\r\nd21 = min(0.5, aMin / ms); // safe attack period\r\nd32 = min(0.5, rMin / ms); // safe release period\r\nd31 = d21 + d32; // safeNoteLength\r\n\r\nx1 = max(0, min(x01, 1 - d31)); // protect start\r\nx3 = min(1, max(x03, x1 + d31)); // protect end\r\nx2 = x1 + min(x3 - d32, max(x02 - x1, d21)); // protect middle\r\n\r\nrampUp = (x - x1) / (x2 - x1);\r\nrampDown = 1 - (x - x2) / (x3 - x2);\r\n\r\nrampUpDown = min(rampUp,rampDown);\r\ntopClip = min(rampUpDown,1);\r\nbottomClip = max(topClip, 0);\r\namplitude = bottomClip;\r\n\r\nout1 = amplitude;",
+					"code" : "x = in1; // current phase (0-1)\r\n\r\naMin = 5; // minimum attack time ms\r\nrMin = 5; // minimum release time ms\r\n\r\nx01 = 0.1; // note start time \r\nx02 = 0.9; // note peak time\r\nx03 = 0.9; // note end time\r\n\r\nd21 = min(0.5, aMin / ms); // safe attack period\r\nd32 = min(0.5, rMin / ms); // safe release period\r\nd31 = d21 + d32; // safeNoteLength\r\n\r\nx1 = max(0, min(x01, 1 - d31)); // protect start\r\nx3 = min(1, max(x03, x1 + d31)); // protect end\r\nx2 = x1 + min(x3 - x1 - d32, max(x02 - x1, d21)); // protect middle\r\n\r\nrampUp = (x - x1) / (x2 - x1);\r\nrampDown = 1 - (x - x2) / (x3 - x2);\r\n\r\nrampUpDown = min(rampUp,rampDown);\r\ntopClip = min(rampUpDown,1);\r\nbottomClip = max(topClip, 0);\r\namplitude = bottomClip;\r\n\r\n\r\nout1 = amplitude;\r\nout2 = x1;\r\nout3 = x2;\r\nout4 = x3;",
 					"fontface" : 0,
 					"fontname" : "<Monospaced>",
 					"fontsize" : 12.0,
 					"id" : "obj-5",
 					"maxclass" : "codebox",
 					"numinlets" : 1,
-					"numoutlets" : 1,
-					"outlettype" : [ "" ],
+					"numoutlets" : 4,
+					"outlettype" : [ "", "", "", "" ],
 					"patching_rect" : [ 50.0, 74.0, 532.0, 482.0 ]
 				}
 
@@ -98,8 +131,29 @@
 			}
 , 			{
 				"patchline" : 				{
+					"destination" : [ "obj-3", 0 ],
+					"source" : [ "obj-5", 1 ]
+				}
+
+			}
+, 			{
+				"patchline" : 				{
 					"destination" : [ "obj-4", 0 ],
 					"source" : [ "obj-5", 0 ]
+				}
+
+			}
+, 			{
+				"patchline" : 				{
+					"destination" : [ "obj-6", 0 ],
+					"source" : [ "obj-5", 2 ]
+				}
+
+			}
+, 			{
+				"patchline" : 				{
+					"destination" : [ "obj-7", 0 ],
+					"source" : [ "obj-5", 3 ]
 				}
 
 			}

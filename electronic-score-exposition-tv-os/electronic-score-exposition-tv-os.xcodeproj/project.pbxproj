@@ -13,7 +13,6 @@
 		AF5DBF8A2860C3DC00509FAC /* Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = AF5DBF892860C3DC00509FAC /* Assets.xcassets */; };
 		AF5DBF8D2860C3DC00509FAC /* Preview Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = AF5DBF8C2860C3DC00509FAC /* Preview Assets.xcassets */; };
 		AF6C17F2286C61960016E144 /* SwiftUIView.swift in Sources */ = {isa = PBXBuildFile; fileRef = AF6C17F1286C61960016E144 /* SwiftUIView.swift */; };
-		AFBFED0A286E4EEA00C9DD6F /* TriangleEnvelope.swift in Sources */ = {isa = PBXBuildFile; fileRef = AFBFED09286E4EEA00C9DD6F /* TriangleEnvelope.swift */; };
 		AFD72D71286A7DA4002A4594 /* SporthAudioKit in Frameworks */ = {isa = PBXBuildFile; productRef = AFD72D70286A7DA4002A4594 /* SporthAudioKit */; };
 /* End PBXBuildFile section */
 
@@ -26,7 +25,6 @@
 		AF5DBF892860C3DC00509FAC /* Assets.xcassets */ = {isa = PBXFileReference; lastKnownFileType = folder.assetcatalog; path = Assets.xcassets; sourceTree = "<group>"; };
 		AF5DBF8C2860C3DC00509FAC /* Preview Assets.xcassets */ = {isa = PBXFileReference; lastKnownFileType = folder.assetcatalog; path = "Preview Assets.xcassets"; sourceTree = "<group>"; };
 		AF6C17F1286C61960016E144 /* SwiftUIView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SwiftUIView.swift; sourceTree = "<group>"; };
-		AFBFED09286E4EEA00C9DD6F /* TriangleEnvelope.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TriangleEnvelope.swift; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -74,7 +72,6 @@
 				AF5DBF852860C3DB00509FAC /* electronic_score_exposition_tv_osApp.swift */,
 				AF5DBF872860C3DB00509FAC /* ContentView.swift */,
 				AF6C17F1286C61960016E144 /* SwiftUIView.swift */,
-				AFBFED09286E4EEA00C9DD6F /* TriangleEnvelope.swift */,
 				AF5DBF892860C3DC00509FAC /* Assets.xcassets */,
 				AF5DBF8B2860C3DC00509FAC /* Preview Content */,
 			);
@@ -166,7 +163,6 @@
 			buildActionMask = 2147483647;
 			files = (
 				AF5DBF882860C3DB00509FAC /* ContentView.swift in Sources */,
-				AFBFED0A286E4EEA00C9DD6F /* TriangleEnvelope.swift in Sources */,
 				AF5DBF862860C3DB00509FAC /* electronic_score_exposition_tv_osApp.swift in Sources */,
 				AF6C17F2286C61960016E144 /* SwiftUIView.swift in Sources */,
 			);
