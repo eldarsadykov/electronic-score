@@ -15,7 +15,7 @@ import SporthAudioKit
 import SwiftUI
 
 class BasicEventConductor: ObservableObject {
-    let ms = 6000.0
+    let ms = 1000.0
     let triangle1 = Triangle(x1: 0.25, y1: 0.25, x2: 1, y2: 1, x3: 1, y3: 0)
     let triangle2 = Triangle(x1: 0.0, y1: 1, x2: 1, y2: 1, x3: 1, y3: 0)
 
@@ -29,6 +29,9 @@ class BasicEventConductor: ObservableObject {
     let mainPhasor: OperationGenerator
     let sound1: OperationEffect
     let sound2: OperationEffect
+    let sum: Mixer
+    let reverb: CostelloReverb
+    let dryWetMixer: DryWetMixer
 
     init() {
         mainPhasor = OperationGenerator { parameters in
@@ -37,12 +40,12 @@ class BasicEventConductor: ObservableObject {
         }
 
         func createSound(input: OperationGenerator) -> OperationEffect {
-            let sound = OperationEffect(input) { input, parameters in
+            OperationEffect(input) { input, parameters in
                 let ms = parameters[0]
                 let x = input / 2
                 let midiNote = parameters[4] * 12 + 48
                 let frequency = midiNote.midiNoteToFrequency()
-                let aMin = 10.0 // minimum attack time ms
+                let aMin = 5.0 // minimum attack time ms
                 let rMin = 10.0 // minimum release time ms
 
                 let x01 = parameters[1] // note start time
@@ -67,7 +70,6 @@ class BasicEventConductor: ObservableObject {
 
                 return Operation.fmOscillator(baseFrequency: frequency, carrierMultiplier: 1, modulatingMultiplier: 1, modulationIndex: amplitude, amplitude: amplitude * amplitude)
             }
-            return sound
         }
 
         sound1 = createSound(input: mainPhasor)
@@ -86,7 +88,11 @@ class BasicEventConductor: ObservableObject {
         sound2.parameter4 = AUValue(triangle2.x3)
         sound2.parameter5 = AUValue(triangle2.y1)
 
-        engine.output = Mixer(sound1, sound2)
+        sum = Mixer(sound1, sound2)
+        reverb = CostelloReverb(sum, feedback: 0.8, cutoffFrequency: 20000)
+        dryWetMixer = DryWetMixer(sum, reverb)
+        dryWetMixer.balance = 0.3
+        engine.output = dryWetMixer
     }
 
     func start() {
