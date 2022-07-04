@@ -15,8 +15,8 @@ import SporthAudioKit
 import SwiftUI
 
 class BasicEventConductor: ObservableObject {
-    let ms = 1000.0
-    let triangle1 = Triangle(x1: 0.25, y1: 0.25, x2: 1, y2: 1, x3: 1, y3: 0)
+    let ms = 6000.0
+    let triangle1 = Triangle(x1: 0.25, y1: 0.25, x2: 0.25, y2: 1, x3: 1, y3: 0)
     let triangle2 = Triangle(x1: 0.0, y1: 1, x2: 1, y2: 1, x3: 1, y3: 0)
 
     let engine = AudioEngine()
@@ -45,7 +45,7 @@ class BasicEventConductor: ObservableObject {
                 let x = input / 2
                 let midiNote = parameters[4] * 12 + 48
                 let frequency = midiNote.midiNoteToFrequency()
-                let aMin = 5.0 // minimum attack time ms
+                let aMin = 10.0 // minimum attack time ms
                 let rMin = 10.0 // minimum release time ms
 
                 let x01 = parameters[1] // note start time
@@ -91,7 +91,7 @@ class BasicEventConductor: ObservableObject {
         sum = Mixer(sound1, sound2)
         reverb = CostelloReverb(sum, feedback: 0.8, cutoffFrequency: 20000)
         dryWetMixer = DryWetMixer(sum, reverb)
-        dryWetMixer.balance = 0.3
+        dryWetMixer.balance = 0.25
         engine.output = dryWetMixer
     }
 
@@ -162,40 +162,48 @@ struct SwiftUIView: View {
     @StateObject var conductor = BasicEventConductor()
 
     var body: some View {
-        VStack(spacing: 20) {
-            GeometryReader { geometry in
-                ZStack {
-                    Grid()
-                        .stroke(lineWidth: 2)
-                        .opacity(0.25)
-                    conductor.triangle1
-                        .stroke(style: StrokeStyle(lineWidth: 4, lineCap: .round, lineJoin: .round))
-
-                    conductor.triangle2
-                        .stroke(style: StrokeStyle(lineWidth: 4, lineCap: .round, lineJoin: .round))
-
-                    Playhead()
-                        .stroke(style: StrokeStyle(lineWidth: 8, lineCap: .butt))
-                        .foregroundColor(Color.red)
-                        .offset(x: geometry.size.width * (conductor.isRunning ? 0.5 : -0.5))
-                        .opacity(0.5)
-
-                        .animation(Animation.linear(duration: conductor.ms / 1000.0).repeatForever(autoreverses: false), value: conductor.isRunning)
+        ScrollView(.horizontal, showsIndicators: false) {
+            HStack {
+                Button("Hello") {
                 }
+                GeometryReader { geometry in
+                    ZStack {
+                        Grid()
+                            .stroke(lineWidth: 2)
+                            .opacity(0.25)
+                        conductor.triangle1
+                            .stroke(style: StrokeStyle(lineWidth: 4, lineCap: .round, lineJoin: .round))
+//                            .focusable()
+
+                        conductor.triangle2
+                            .stroke(style: StrokeStyle(lineWidth: 4, lineCap: .round, lineJoin: .round))
+//                            .focusable()
+
+                        Playhead()
+                            .stroke(style: StrokeStyle(lineWidth: 8, lineCap: .butt))
+                            .foregroundColor(Color.red)
+                            .offset(x: geometry.size.width * (conductor.isRunning ? 0.5 : -0.5))
+                            .opacity(0.5)
+
+                            .animation(Animation.linear(duration: conductor.ms / 1000.0).repeatForever(autoreverses: false), value: conductor.isRunning)
+                    }
+                    .onAppear {
+                        conductor.isRunning.toggle()
+                    }
+                    //                Button(conductor.isRunning ? "Stop" : "Start") {
+                    //                    conductor.isRunning.toggle()
+                    //                }
+                }
+                .frame(width: 6000)
                 .onAppear {
-                    conductor.isRunning.toggle()
+                    self.conductor.start()
                 }
-//                Button(conductor.isRunning ? "Stop" : "Start") {
-//                    conductor.isRunning.toggle()
-//                }
+                .onDisappear {
+                    self.conductor.stop()
+                }
+                Button("Hello") {
+                }
             }
-        }
-        .padding()
-        .onAppear {
-            self.conductor.start()
-        }
-        .onDisappear {
-            self.conductor.stop()
         }
     }
 }
