@@ -15,17 +15,19 @@ import SporthAudioKit
 import SwiftUI
 
 class BasicEventConductor: ObservableObject {
+    var cursor: Int
     var startDate = Date().timeIntervalSinceReferenceDate
-    let ms = 6000.0
+    let ms: Int = 2000
     let triangle1 = Triangle(x1: 0.0, y1: 0.25, x2: 0.0, y2: 1, x3: 1, y3: 0)
-    let triangle2 = Triangle(x1: 0.5, y1: 1, x2: 0.5, y2: 0, x3: 1, y3: 0)
+    let triangle2 = Triangle(x1: 0.0, y1: 1, x2: 0.5, y2: 0, x3: 1, y3: 0)
 
     let engine = AudioEngine()
-    @Published var isRunning = false {
-        didSet {
-            isRunning ? mainPhasor.start() : mainPhasor.stop()
-        }
-    }
+    @Published var isRunning = false
+//    {
+//        didSet {
+//            isRunning ? testEvent.start() : testEvent.stop()
+//        }
+//    }
 
     let mainPhasor: OperationGenerator
     let sound1: OperationEffect
@@ -33,8 +35,16 @@ class BasicEventConductor: ObservableObject {
     let sum: Mixer
     let reverb: CostelloReverb
     let dryWetMixer: DryWetMixer
+    let testEvent: OperationGenerator
 
     init() {
+        testEvent = OperationGenerator { parameters in
+            let line = Operation.lineSegment(trigger: parameters[0],
+                                             start: 0.0,
+                                             end: 1.0,
+                                             duration: 0.5 * parameters[1] / 1000.0)
+            return Operation.fmOscillator(baseFrequency: 220, carrierMultiplier: 1, modulatingMultiplier: 1, modulationIndex: 1, amplitude: min(line, 1 - line))
+        }
         mainPhasor = OperationGenerator { parameters in
             let ms = parameters[0] // total score time ms
             return Operation.phasor(frequency: 1000 / ms, phase: 0.0)
@@ -72,11 +82,13 @@ class BasicEventConductor: ObservableObject {
                 return Operation.fmOscillator(baseFrequency: frequency, carrierMultiplier: 1, modulatingMultiplier: 1, modulationIndex: amplitude, amplitude: amplitude * amplitude)
             }
         }
-
+        cursor = 0
         sound1 = createSound(input: mainPhasor)
         sound2 = createSound(input: mainPhasor)
-
+        testEvent.parameter1 = 1.0
+        testEvent.parameter2 = AUValue(ms)
         mainPhasor.parameter1 = AUValue(ms)
+
         sound1.parameter1 = AUValue(ms)
         sound1.parameter2 = AUValue(triangle1.x1)
         sound1.parameter3 = AUValue(triangle1.x2)
@@ -90,10 +102,10 @@ class BasicEventConductor: ObservableObject {
         sound2.parameter5 = AUValue(triangle2.y1)
 
         sum = Mixer(sound1, sound2)
-        reverb = CostelloReverb(sum, feedback: 0.8, cutoffFrequency: 20000)
+        reverb = CostelloReverb(sum, feedback: 0.8, cutoffFrequency: 10000)
         dryWetMixer = DryWetMixer(sum, reverb)
         dryWetMixer.balance = 0.25
-        engine.output = dryWetMixer
+        engine.output = testEvent
     }
 
     func start() {
@@ -112,8 +124,8 @@ class BasicEventConductor: ObservableObject {
 struct Playhead: Shape {
     func path(in rect: CGRect) -> Path {
         var path = Path()
-        path.move(to: CGPoint(x: rect.midX, y: rect.minY))
-        path.addLine(to: CGPoint(x: rect.midX, y: rect.maxY))
+        path.move(to: CGPoint(x: rect.minX, y: rect.minY))
+        path.addLine(to: CGPoint(x: rect.minX, y: rect.maxY))
         return path
     }
 }
@@ -158,21 +170,42 @@ struct Grid: Shape {
     }
 }
 
+func offsetCalc(_ count: Int, width: CGFloat, max: Int) -> CGFloat {
+    width * CGFloat(count) / CGFloat(max)
+}
+
 struct SwiftUIView: View {
-    let timer = Timer.publish(every: 1 / 120, on: .main, in: .common).autoconnect()
-    @State var atEnd = false
+    @State var lineSeg = true
+    let timer = Timer.publish(every: 1 / 1000, on: .main, in: .common).autoconnect()
     @StateObject var conductor = BasicEventConductor()
     @State private var counter = 0
     var body: some View {
+        Button("Toggle: \(lineSeg ? "On" : "Off")") {
+            lineSeg.toggle()
+            conductor.testEvent.parameter1 = lineSeg ? 1.0 : 0.0
+        }
+
         HStack {
             GeometryReader { geometry in
                 Playhead()
                     .stroke(style: StrokeStyle(lineWidth: 8, lineCap: .butt))
+                    .foregroundColor(Color.red)
+                    .opacity(0.5)
                     .onReceive(timer) { _ in
                         self.counter += 1
-                        self.counter %= Int(geometry.size.width)
+                        self.counter %= Int(conductor.ms)
+                        if counter == 500 {
+                            lineSeg = false
+                            conductor.testEvent.start()
+                            conductor.testEvent.parameter1 = lineSeg ? 1.0 : 0.0
+                        }
+                        if counter == 1500 {
+                            lineSeg = true
+                            conductor.testEvent.parameter1 = lineSeg ? 1.0 : 0.0
+                            conductor.testEvent.stop()
+                        }
                     }
-                    .offset(x: CGFloat(counter))
+                    .offset(x: offsetCalc(self.counter, width: geometry.size.width, max: conductor.ms))
                 ZStack {
                     Grid()
                         .stroke(lineWidth: 2)
@@ -187,20 +220,13 @@ struct SwiftUIView: View {
                     conductor.isRunning.toggle()
                     conductor.startDate = Date().timeIntervalSinceReferenceDate
                 }
-                //                Button(conductor.isRunning ? "Stop" : "Start") {
-                //                    conductor.isRunning.toggle()
-                //                }
             }
-//                .frame(width: 6000)
             .onAppear {
                 self.conductor.start()
             }
             .onDisappear {
                 self.conductor.stop()
             }
-//                Button("Hello") {
-//                }
         }
-//        }
     }
 }
