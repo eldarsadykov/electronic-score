@@ -15,9 +15,10 @@ import SporthAudioKit
 import SwiftUI
 
 class BasicEventConductor: ObservableObject {
+    var startDate = Date().timeIntervalSinceReferenceDate
     let ms = 6000.0
-    let triangle1 = Triangle(x1: 0.25, y1: 0.25, x2: 0.25, y2: 1, x3: 1, y3: 0)
-    let triangle2 = Triangle(x1: 0.0, y1: 1, x2: 1, y2: 1, x3: 1, y3: 0)
+    let triangle1 = Triangle(x1: 0.0, y1: 0.25, x2: 0.0, y2: 1, x3: 1, y3: 0)
+    let triangle2 = Triangle(x1: 0.5, y1: 1, x2: 0.5, y2: 0, x3: 1, y3: 0)
 
     let engine = AudioEngine()
     @Published var isRunning = false {
@@ -140,70 +141,66 @@ struct Triangle: InsettableShape {
     }
 }
 
-struct SwiftUIView: View {
-    @State var atEnd = false
-    struct Grid: Shape {
-        func path(in rect: CGRect) -> Path {
-            var path = Path()
-            let minX = rect.minX
-            let minY = rect.minY
-            let maxX = rect.maxX
-            let maxY = rect.maxY
-            for i in 0 ... 12 {
-                path.move(to: CGPoint(x: maxX * CGFloat(i) / 12, y: minY))
-                path.addLine(to: CGPoint(x: maxX * CGFloat(i) / 12, y: maxY))
-                path.move(to: CGPoint(x: minX, y: maxY * CGFloat(i) / 12))
-                path.addLine(to: CGPoint(x: maxX, y: maxY * CGFloat(i) / 12))
-            }
-            return path
+struct Grid: Shape {
+    func path(in rect: CGRect) -> Path {
+        var path = Path()
+        let minX = rect.minX
+        let minY = rect.minY
+        let maxX = rect.maxX
+        let maxY = rect.maxY
+        for i in 0 ... 12 {
+            path.move(to: CGPoint(x: maxX * CGFloat(i) / 12, y: minY))
+            path.addLine(to: CGPoint(x: maxX * CGFloat(i) / 12, y: maxY))
+            path.move(to: CGPoint(x: minX, y: maxY * CGFloat(i) / 12))
+            path.addLine(to: CGPoint(x: maxX, y: maxY * CGFloat(i) / 12))
         }
+        return path
     }
+}
 
+struct SwiftUIView: View {
+    let timer = Timer.publish(every: 1 / 120, on: .main, in: .common).autoconnect()
+    @State var atEnd = false
     @StateObject var conductor = BasicEventConductor()
-
+    @State private var counter = 0
     var body: some View {
-        ScrollView(.horizontal, showsIndicators: false) {
-            HStack {
-                Button("Hello") {
-                }
-                GeometryReader { geometry in
-                    ZStack {
-                        Grid()
-                            .stroke(lineWidth: 2)
-                            .opacity(0.25)
-                        conductor.triangle1
-                            .stroke(style: StrokeStyle(lineWidth: 4, lineCap: .round, lineJoin: .round))
-//                            .focusable()
-
-                        conductor.triangle2
-                            .stroke(style: StrokeStyle(lineWidth: 4, lineCap: .round, lineJoin: .round))
-//                            .focusable()
-
-                        Playhead()
-                            .stroke(style: StrokeStyle(lineWidth: 8, lineCap: .butt))
-                            .foregroundColor(Color.red)
-                            .offset(x: geometry.size.width * (conductor.isRunning ? 0.5 : -0.5))
-                            .opacity(0.5)
-
-                            .animation(Animation.linear(duration: conductor.ms / 1000.0).repeatForever(autoreverses: false), value: conductor.isRunning)
+        HStack {
+            GeometryReader { geometry in
+                Playhead()
+                    .stroke(style: StrokeStyle(lineWidth: 8, lineCap: .butt))
+                    .onReceive(timer) { _ in
+                        self.counter += 1
+                        self.counter %= Int(geometry.size.width)
                     }
-                    .onAppear {
-                        conductor.isRunning.toggle()
-                    }
-                    //                Button(conductor.isRunning ? "Stop" : "Start") {
-                    //                    conductor.isRunning.toggle()
-                    //                }
+                    .offset(x: CGFloat(counter))
+                ZStack {
+                    Grid()
+                        .stroke(lineWidth: 2)
+                        .opacity(0.25)
+                    conductor.triangle1
+                        .stroke(style: StrokeStyle(lineWidth: 4, lineCap: .round, lineJoin: .round))
+
+                    conductor.triangle2
+                        .stroke(style: StrokeStyle(lineWidth: 4, lineCap: .round, lineJoin: .round))
                 }
-                .frame(width: 6000)
                 .onAppear {
-                    self.conductor.start()
+                    conductor.isRunning.toggle()
+                    conductor.startDate = Date().timeIntervalSinceReferenceDate
                 }
-                .onDisappear {
-                    self.conductor.stop()
-                }
-                Button("Hello") {
-                }
+                //                Button(conductor.isRunning ? "Stop" : "Start") {
+                //                    conductor.isRunning.toggle()
+                //                }
             }
+//                .frame(width: 6000)
+            .onAppear {
+                self.conductor.start()
+            }
+            .onDisappear {
+                self.conductor.stop()
+            }
+//                Button("Hello") {
+//                }
         }
+//        }
     }
 }

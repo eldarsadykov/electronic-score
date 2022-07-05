@@ -61,6 +61,7 @@ class OscillatorObject {
 }
 
 struct ContentView: View {
+    @State private var counter = 0
     @State var atEnd: Bool = false
     @State var playStop: Bool = false
 

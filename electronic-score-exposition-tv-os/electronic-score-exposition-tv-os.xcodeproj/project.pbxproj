@@ -14,7 +14,8 @@
 		AF5DBF8D2860C3DC00509FAC /* Preview Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = AF5DBF8C2860C3DC00509FAC /* Preview Assets.xcassets */; };
 		AF5F57BA2871DE5D00E10066 /* Question1View.swift in Sources */ = {isa = PBXBuildFile; fileRef = AF5F57B92871DE5D00E10066 /* Question1View.swift */; };
 		AF6C17F2286C61960016E144 /* SwiftUIView.swift in Sources */ = {isa = PBXBuildFile; fileRef = AF6C17F1286C61960016E144 /* SwiftUIView.swift */; };
-		AFD72D71286A7DA4002A4594 /* SporthAudioKit in Frameworks */ = {isa = PBXBuildFile; productRef = AFD72D70286A7DA4002A4594 /* SporthAudioKit */; };
+		AFDC78372874572E00970B7F /* AudioKit in Frameworks */ = {isa = PBXBuildFile; productRef = AFDC78362874572E00970B7F /* AudioKit */; };
+		AFDC783A2874574000970B7F /* SporthAudioKit in Frameworks */ = {isa = PBXBuildFile; productRef = AFDC78392874574000970B7F /* SporthAudioKit */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXFileReference section */
@@ -34,7 +35,8 @@
 			isa = PBXFrameworksBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
-				AFD72D71286A7DA4002A4594 /* SporthAudioKit in Frameworks */,
+				AFDC78372874572E00970B7F /* AudioKit in Frameworks */,
+				AFDC783A2874574000970B7F /* SporthAudioKit in Frameworks */,
 				AF31C9E728634C1B00156189 /* GameController.framework in Frameworks */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
@@ -106,7 +108,8 @@
 			);
 			name = "electronic-score-exposition-tv-os";
 			packageProductDependencies = (
-				AFD72D70286A7DA4002A4594 /* SporthAudioKit */,
+				AFDC78362874572E00970B7F /* AudioKit */,
+				AFDC78392874574000970B7F /* SporthAudioKit */,
 			);
 			productName = "electronic-score-exposition-tv-os";
 			productReference = AF5DBF822860C3DB00509FAC /* electronic-score-exposition-tv-os.app */;
@@ -137,7 +140,8 @@
 			);
 			mainGroup = AF5DBF792860C3DB00509FAC;
 			packageReferences = (
-				AFD72D6F286A7DA4002A4594 /* XCRemoteSwiftPackageReference "SporthAudioKit" */,
+				AFDC78352874572E00970B7F /* XCRemoteSwiftPackageReference "AudioKit" */,
+				AFDC78382874574000970B7F /* XCRemoteSwiftPackageReference "SporthAudioKit" */,
 			);
 			productRefGroup = AF5DBF832860C3DB00509FAC /* Products */;
 			projectDirPath = "";
@@ -369,7 +373,15 @@
 /* End XCConfigurationList section */
 
 /* Begin XCRemoteSwiftPackageReference section */
-		AFD72D6F286A7DA4002A4594 /* XCRemoteSwiftPackageReference "SporthAudioKit" */ = {
+		AFDC78352874572E00970B7F /* XCRemoteSwiftPackageReference "AudioKit" */ = {
+			isa = XCRemoteSwiftPackageReference;
+			repositoryURL = "https://github.com/AudioKit/AudioKit.git";
+			requirement = {
+				kind = upToNextMajorVersion;
+				minimumVersion = 5.0.0;
+			};
+		};
+		AFDC78382874574000970B7F /* XCRemoteSwiftPackageReference "SporthAudioKit" */ = {
 			isa = XCRemoteSwiftPackageReference;
 			repositoryURL = "https://github.com/AudioKit/SporthAudioKit.git";
 			requirement = {
@@ -380,9 +392,14 @@
 /* End XCRemoteSwiftPackageReference section */
 
 /* Begin XCSwiftPackageProductDependency section */
-		AFD72D70286A7DA4002A4594 /* SporthAudioKit */ = {
+		AFDC78362874572E00970B7F /* AudioKit */ = {
 			isa = XCSwiftPackageProductDependency;
-			package = AFD72D6F286A7DA4002A4594 /* XCRemoteSwiftPackageReference "SporthAudioKit" */;
+			package = AFDC78352874572E00970B7F /* XCRemoteSwiftPackageReference "AudioKit" */;
+			productName = AudioKit;
+		};
+		AFDC78392874574000970B7F /* SporthAudioKit */ = {
+			isa = XCSwiftPackageProductDependency;
+			package = AFDC78382874574000970B7F /* XCRemoteSwiftPackageReference "SporthAudioKit" */;
 			productName = SporthAudioKit;
 		};
 /* End XCSwiftPackageProductDependency section */

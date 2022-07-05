@@ -3,7 +3,7 @@
     {
       "identity" : "audiokit",
       "kind" : "remoteSourceControl",
-      "location" : "https://github.com/AudioKit/AudioKit",
+      "location" : "https://github.com/AudioKit/AudioKit.git",
       "state" : {
         "revision" : "576528c7618838ed3bdb967b4e176841994aa01d",
         "version" : "5.4.4"
@@ -32,8 +32,8 @@
       "kind" : "remoteSourceControl",
       "location" : "https://github.com/AudioKit/SoundpipeAudioKit",
       "state" : {
-        "revision" : "26465fb687d710aa99a8ec04b60a05c6665cd6ed",
-        "version" : "5.4.2"
+        "revision" : "471bd2be920d3611f382511fb6217cb2408f8de9",
+        "version" : "5.4.3"
       }
     },
     {
