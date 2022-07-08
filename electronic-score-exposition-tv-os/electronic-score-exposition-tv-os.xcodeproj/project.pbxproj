@@ -137,8 +137,6 @@
 			);
 			mainGroup = AF5DBF792860C3DB00509FAC;
 			packageReferences = (
-				AF360BF62878680D006474F2 /* XCRemoteSwiftPackageReference "SporthAudioKit" */,
-				AF360BF72878681E006474F2 /* XCRemoteSwiftPackageReference "AudioKit" */,
 			);
 			productRefGroup = AF5DBF832860C3DB00509FAC /* Products */;
 			projectDirPath = "";
@@ -369,25 +367,6 @@
 			defaultConfigurationName = Release;
 		};
 /* End XCConfigurationList section */
-
-/* Begin XCRemoteSwiftPackageReference section */
-		AF360BF62878680D006474F2 /* XCRemoteSwiftPackageReference "SporthAudioKit" */ = {
-			isa = XCRemoteSwiftPackageReference;
-			repositoryURL = "https://github.com/AudioKit/SporthAudioKit.git";
-			requirement = {
-				kind = upToNextMajorVersion;
-				minimumVersion = 5.0.0;
-			};
-		};
-		AF360BF72878681E006474F2 /* XCRemoteSwiftPackageReference "AudioKit" */ = {
-			isa = XCRemoteSwiftPackageReference;
-			repositoryURL = "https://github.com/AudioKit/AudioKit.git";
-			requirement = {
-				kind = upToNextMajorVersion;
-				minimumVersion = 5.0.0;
-			};
-		};
-/* End XCRemoteSwiftPackageReference section */
 	};
 	rootObject = AF5DBF7A2860C3DB00509FAC /* Project object */;
 }
