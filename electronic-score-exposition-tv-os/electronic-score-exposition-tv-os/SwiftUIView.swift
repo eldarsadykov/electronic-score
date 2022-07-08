@@ -42,7 +42,7 @@ class BasicEventConductor: ObservableObject {
             let line = Operation.lineSegment(trigger: parameters[0],
                                              start: 0.0,
                                              end: 1.0,
-                                             duration: 0.5 * parameters[1] / 1000.0)
+                                             duration: 0.4 * parameters[1] / 1000.0)
             return Operation.fmOscillator(baseFrequency: 220, carrierMultiplier: 1, modulatingMultiplier: 1, modulationIndex: 1, amplitude: min(line, 1 - line))
         }
         mainPhasor = OperationGenerator { parameters in
