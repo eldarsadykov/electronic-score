@@ -19,7 +19,7 @@ struct MainView: View {
                     .opacity(0.25)
                 // CONTENT
                 ForEach(0 ..< score.count, id: \.self) { i in
-
+                    let incircle = incircleParams(score[i], width: geo.size.width, height: geo.size.height)
                     TriangleFramed(x: (score[i][1] - score[i][0]) / (score[i][2] - score[i][0]), y1: triangleCoordY(y: score[i][3], y1: score[i][3], y2: score[i][4], y3: score[i][5]), y2: triangleCoordY(y: score[i][4], y1: score[i][3], y2: score[i][4], y3: score[i][5]), y3: triangleCoordY(y: score[i][5], y1: score[i][3], y2: score[i][4], y3: score[i][5]))
                         .stroke(style: StrokeStyle(lineWidth: 4, lineCap: .round, lineJoin: .round))
                         .frame(width: (score[i][2] - score[i][0]) * geo.size.width, height: (max(score[i][3], score[i][4], score[i][5]) - min(score[i][3], score[i][4], score[i][5])) * geo.size.height)
@@ -27,9 +27,8 @@ struct MainView: View {
 
                     Ellipse()
                         .opacity(0.25)
-                        .frame(width: incircleParams(score[i])[2] * 2 * geo.size.width, height: incircleParams(score[i])[2] * 2 * geo.size.height)
-                        .offset(x: -0.5 * geo.size.width, y: 0.5 * geo.size.height)
-                        .offset(x: incircleParams(score[i])[0] * geo.size.width, y: -incircleParams(score[i])[1] * geo.size.height)
+                        .frame(width: incircle[2], height: incircle[2])
+                        .offset(x: incircle[0], y: -incircle[1])
                 }
 
                 // FOREGROUND

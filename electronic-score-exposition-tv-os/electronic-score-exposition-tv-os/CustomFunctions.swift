@@ -18,21 +18,21 @@ func triangleOffset(dim: Double, dimMin: Double, dimMax: Double) -> Double {
     return step3
 }
 
-func incircleParams(_ triangleParams: [Double]) -> [Double] {
-    let x1: Double = triangleParams[0]
-    let x2: Double = triangleParams[1]
-    let x3: Double = triangleParams[2]
-    let y1: Double = triangleParams[3]
-    let y2: Double = triangleParams[4]
-    let y3: Double = triangleParams[5]
+func incircleParams(_ triangleParams: [Double], width: Double, height: Double) -> [Double] {
+    let x1: Double = triangleParams[0] * width
+    let x2: Double = triangleParams[1] * width
+    let x3: Double = triangleParams[2] * width
+    let y1: Double = triangleParams[3] * height
+    let y2: Double = triangleParams[4] * height
+    let y3: Double = triangleParams[5] * height
     let a: Double = distance(x2, y2, x3, y3)
     let b: Double = distance(x1, y1, x3, y3)
     let c: Double = distance(x1, y1, x2, y2)
     let s = (a + b + c) / 2
-    let icX = (a * x1 + b * x2 + c * x3) / (a + b + c)
-    let icY = (a * y1 + b * y2 + c * y3) / (a + b + c)
-    let icR = sqrt(((s - a) * (s - b) * (s - c)) / s)
-    return [icX, icY, icR]
+    let icX = (a * x1 + b * x2 + c * x3) / (a + b + c) - 0.5 * width
+    let icY = (a * y1 + b * y2 + c * y3) / (a + b + c) - 0.5 * height
+    let icD = sqrt(((s - a) * (s - b) * (s - c)) / s) * 2
+    return [icX, icY, icD]
 }
 
 func distance(_ x1: Double, _ y1: Double, _ x2: Double, _ y2: Double) -> Double {
