@@ -7,18 +7,9 @@
 
 import SwiftUI
 
-func triangleCoordY(y: Double, y1: Double, y2: Double, y3: Double) -> Double {
-    (y - min(y1, y2, y3)) / (max(y1, y2, y3) - min(y1, y2, y3))
-}
-
-func triangleOffset(dim: Double, dimMin: Double, dimMax: Double) -> Double {
-    let step1 = -dim / 2 // move center of the object to the left/top side of canvas
-    let step2 = step1 + (dimMax - dimMin) * dim / 2 // offset by a half of width/height of the object to put its left/top side to the left/top side of the canvas
-    let step3 = step2 + dimMin * dim // do normal offset based on coordinates
-    return step3
-}
-
 struct MainView: View {
+    let timer = Timer.publish(every: 1 / 144, on: .main, in: .common).autoconnect()
+    @State private var counter = 0
     var body: some View {
         GeometryReader { geo in
             ZStack {
@@ -27,17 +18,30 @@ struct MainView: View {
                     .stroke(lineWidth: 2)
                     .opacity(0.25)
                 // CONTENT
-                ForEach(0 ..< triangleScoreTest2.count, id: \.self) { i in
-                    TriangleFramed(x: (triangleScoreTest2[i][1] - triangleScoreTest2[i][0]) / (triangleScoreTest2[i][2] - triangleScoreTest2[i][0]), y1: triangleCoordY(y: triangleScoreTest2[i][3], y1: triangleScoreTest2[i][3], y2: triangleScoreTest2[i][4], y3: triangleScoreTest2[i][5]), y2: triangleCoordY(y: triangleScoreTest2[i][4], y1: triangleScoreTest2[i][3], y2: triangleScoreTest2[i][4], y3: triangleScoreTest2[i][5]), y3: triangleCoordY(y: triangleScoreTest2[i][5], y1: triangleScoreTest2[i][3], y2: triangleScoreTest2[i][4], y3: triangleScoreTest2[i][5]))
+                ForEach(0 ..< score.count, id: \.self) { i in
+
+                    TriangleFramed(x: (score[i][1] - score[i][0]) / (score[i][2] - score[i][0]), y1: triangleCoordY(y: score[i][3], y1: score[i][3], y2: score[i][4], y3: score[i][5]), y2: triangleCoordY(y: score[i][4], y1: score[i][3], y2: score[i][4], y3: score[i][5]), y3: triangleCoordY(y: score[i][5], y1: score[i][3], y2: score[i][4], y3: score[i][5]))
                         .stroke(style: StrokeStyle(lineWidth: 4, lineCap: .round, lineJoin: .round))
-                        .frame(width: (triangleScoreTest2[i][2] - triangleScoreTest2[i][0]) * geo.size.width, height: (max(triangleScoreTest2[i][3], triangleScoreTest2[i][4], triangleScoreTest2[i][5]) - min(triangleScoreTest2[i][3], triangleScoreTest2[i][4], triangleScoreTest2[i][5])) * geo.size.height)
-                        .offset(x: triangleOffset(dim: geo.size.width, dimMin: triangleScoreTest2[i][0], dimMax: triangleScoreTest2[i][2]), y: -triangleOffset(dim: geo.size.height, dimMin: min(triangleScoreTest2[i][3], triangleScoreTest2[i][4], triangleScoreTest2[i][5]), dimMax: max(triangleScoreTest2[i][3], triangleScoreTest2[i][4], triangleScoreTest2[i][5])))
+                        .frame(width: (score[i][2] - score[i][0]) * geo.size.width, height: (max(score[i][3], score[i][4], score[i][5]) - min(score[i][3], score[i][4], score[i][5])) * geo.size.height)
+                        .offset(x: triangleOffset(dim: geo.size.width, dimMin: score[i][0], dimMax: score[i][2]), y: -triangleOffset(dim: geo.size.height, dimMin: min(score[i][3], score[i][4], score[i][5]), dimMax: max(score[i][3], score[i][4], score[i][5])))
+
+                    Ellipse()
+                        .opacity(0.25)
+                        .frame(width: incircleParams(score[i])[2] * 2 * geo.size.width, height: incircleParams(score[i])[2] * 2 * geo.size.height)
+                        .offset(x: -0.5 * geo.size.width, y: 0.5 * geo.size.height)
+                        .offset(x: incircleParams(score[i])[0] * geo.size.width, y: -incircleParams(score[i])[1] * geo.size.height)
                 }
+
                 // FOREGROUND
                 Playhead()
                     .stroke(style: StrokeStyle(lineWidth: 8, lineCap: .butt))
-                    .foregroundColor(Color.red)
+                    .foregroundColor(Color.green)
                     .opacity(0.5)
+                    .onReceive(timer) { _ in
+                        self.counter += 1
+                        self.counter %= 5000
+                    }
+                    .offset(x: cursorOffsetCalc(counter, width: geo.size.width, max: 5000))
             }
         }
     }

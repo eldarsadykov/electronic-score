@@ -121,10 +121,6 @@ class BasicEventConductor: ObservableObject {
     }
 }
 
-func offsetCalc(_ count: Int, width: CGFloat, max: Int) -> CGFloat {
-    width * CGFloat(count) / CGFloat(max)
-}
-
 struct SwiftUIView: View {
     struct Playhead: Shape {
         func path(in rect: CGRect) -> Path {
@@ -173,6 +169,10 @@ struct SwiftUIView: View {
             }
             return path
         }
+    }
+
+    func offsetCalc(_ count: Int, width: CGFloat, max: Int) -> CGFloat {
+        width * CGFloat(count) / CGFloat(max)
     }
 
     @State var lineSeg = true
