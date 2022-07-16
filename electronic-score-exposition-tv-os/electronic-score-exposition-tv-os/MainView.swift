@@ -29,7 +29,7 @@ struct MainView: View {
                                    y2: triangleCoordY(y: score[i][4], y1: score[i][3], y2: score[i][4], y3: score[i][5]),
                                    y3: triangleCoordY(y: score[i][5], y1: score[i][3], y2: score[i][4], y3: score[i][5]))
                         .stroke(style: StrokeStyle(lineWidth: 4, lineCap: .round, lineJoin: .round))
-                        .opacity(0.5)
+                        .opacity(0.75)
                         .frame(width: (score[i][2] - score[i][0]) * geo.size.width,
                                height: (max(score[i][3], score[i][4], score[i][5]) - min(score[i][3], score[i][4], score[i][5])) * geo.size.height)
                         .offset(x: triangleOffset(dim: geo.size.width,
@@ -40,8 +40,8 @@ struct MainView: View {
                                                    dimMax: max(score[i][3], score[i][4], score[i][5])))
 
                     Circle()
-                        .stroke(lineWidth: 1)
-                        .opacity(0.5)
+                        .stroke(style: StrokeStyle(lineWidth: 2, lineCap: .round, lineJoin: .round, miterLimit: 5, dash: [10], dashPhase: 0))
+                        .opacity(0.75)
                         .frame(width: incircle[2])
                         .offset(x: incircle[0], y: -incircle[1])
                     Circle()
