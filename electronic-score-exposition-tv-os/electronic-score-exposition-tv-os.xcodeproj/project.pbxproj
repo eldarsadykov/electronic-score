@@ -10,7 +10,6 @@
 		AF31C9E728634C1B00156189 /* GameController.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = AF31C9E628634C1B00156189 /* GameController.framework */; };
 		AF376A3A287C26930086A0B9 /* MainView.swift in Sources */ = {isa = PBXBuildFile; fileRef = AF376A39287C26930086A0B9 /* MainView.swift */; };
 		AF376A3C287C27590086A0B9 /* CustomShapes.swift in Sources */ = {isa = PBXBuildFile; fileRef = AF376A3B287C27590086A0B9 /* CustomShapes.swift */; };
-		AF376A3F287C2E660086A0B9 /* ScoreData.swift in Sources */ = {isa = PBXBuildFile; fileRef = AF376A3E287C2E660086A0B9 /* ScoreData.swift */; };
 		AF37E034288059BF0048FFD3 /* CustomFunctions.swift in Sources */ = {isa = PBXBuildFile; fileRef = AF37E033288059BF0048FFD3 /* CustomFunctions.swift */; };
 		AF4865A128789917002C93C7 /* SporthAudioKit in Frameworks */ = {isa = PBXBuildFile; productRef = AF4865A028789917002C93C7 /* SporthAudioKit */; };
 		AF5DBF862860C3DB00509FAC /* electronic_score_exposition_tv_osApp.swift in Sources */ = {isa = PBXBuildFile; fileRef = AF5DBF852860C3DB00509FAC /* electronic_score_exposition_tv_osApp.swift */; };
@@ -19,6 +18,7 @@
 		AF5DBF8D2860C3DC00509FAC /* Preview Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = AF5DBF8C2860C3DC00509FAC /* Preview Assets.xcassets */; };
 		AF5F57BA2871DE5D00E10066 /* Question1View.swift in Sources */ = {isa = PBXBuildFile; fileRef = AF5F57B92871DE5D00E10066 /* Question1View.swift */; };
 		AF6C17F2286C61960016E144 /* SwiftUIView.swift in Sources */ = {isa = PBXBuildFile; fileRef = AF6C17F1286C61960016E144 /* SwiftUIView.swift */; };
+		AFC2C92C2885A3E6008830B7 /* EventConductor.swift in Sources */ = {isa = PBXBuildFile; fileRef = AFC2C92B2885A3E6008830B7 /* EventConductor.swift */; };
 		AFDC78412876EC9300970B7F /* ShapeFocusTestView.swift in Sources */ = {isa = PBXBuildFile; fileRef = AFDC78402876EC9300970B7F /* ShapeFocusTestView.swift */; };
 /* End PBXBuildFile section */
 
@@ -27,7 +27,6 @@
 		AF31C9E828634C1B00156189 /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist; path = Info.plist; sourceTree = "<group>"; };
 		AF376A39287C26930086A0B9 /* MainView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MainView.swift; sourceTree = "<group>"; };
 		AF376A3B287C27590086A0B9 /* CustomShapes.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CustomShapes.swift; sourceTree = "<group>"; };
-		AF376A3E287C2E660086A0B9 /* ScoreData.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ScoreData.swift; sourceTree = "<group>"; };
 		AF37E033288059BF0048FFD3 /* CustomFunctions.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CustomFunctions.swift; sourceTree = "<group>"; };
 		AF5DBF822860C3DB00509FAC /* electronic-score-exposition-tv-os.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = "electronic-score-exposition-tv-os.app"; sourceTree = BUILT_PRODUCTS_DIR; };
 		AF5DBF852860C3DB00509FAC /* electronic_score_exposition_tv_osApp.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = electronic_score_exposition_tv_osApp.swift; sourceTree = "<group>"; };
@@ -36,6 +35,7 @@
 		AF5DBF8C2860C3DC00509FAC /* Preview Assets.xcassets */ = {isa = PBXFileReference; lastKnownFileType = folder.assetcatalog; path = "Preview Assets.xcassets"; sourceTree = "<group>"; };
 		AF5F57B92871DE5D00E10066 /* Question1View.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Question1View.swift; sourceTree = "<group>"; };
 		AF6C17F1286C61960016E144 /* SwiftUIView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SwiftUIView.swift; sourceTree = "<group>"; };
+		AFC2C92B2885A3E6008830B7 /* EventConductor.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = EventConductor.swift; sourceTree = "<group>"; };
 		AFDC78402876EC9300970B7F /* ShapeFocusTestView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ShapeFocusTestView.swift; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
@@ -95,9 +95,9 @@
 				AF376A3D287C2BCA0086A0B9 /* OldTests */,
 				AF5DBF852860C3DB00509FAC /* electronic_score_exposition_tv_osApp.swift */,
 				AF376A39287C26930086A0B9 /* MainView.swift */,
+				AFC2C92B2885A3E6008830B7 /* EventConductor.swift */,
 				AF37E033288059BF0048FFD3 /* CustomFunctions.swift */,
 				AF376A3B287C27590086A0B9 /* CustomShapes.swift */,
-				AF376A3E287C2E660086A0B9 /* ScoreData.swift */,
 				AF5DBF892860C3DC00509FAC /* Assets.xcassets */,
 				AF5DBF8B2860C3DC00509FAC /* Preview Content */,
 			);
@@ -188,7 +188,7 @@
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
-				AF376A3F287C2E660086A0B9 /* ScoreData.swift in Sources */,
+				AFC2C92C2885A3E6008830B7 /* EventConductor.swift in Sources */,
 				AF5DBF882860C3DB00509FAC /* ContentView.swift in Sources */,
 				AF376A3A287C26930086A0B9 /* MainView.swift in Sources */,
 				AF5DBF862860C3DB00509FAC /* electronic_score_exposition_tv_osApp.swift in Sources */,

@@ -15,8 +15,6 @@ import SporthAudioKit
 import SwiftUI
 
 class BasicEventConductor: ObservableObject {
-    var cursor: Int
-    var startDate = Date().timeIntervalSinceReferenceDate
     let ms: Int = 2000
     let triangle1 = Triangle(x1: 0.0, y1: 0.25, x2: 0.0, y2: 1, x3: 1, y3: 0)
     let triangle2 = Triangle(x1: 0.0, y1: 1, x2: 0.5, y2: 0, x3: 1, y3: 0)
@@ -28,7 +26,7 @@ class BasicEventConductor: ObservableObject {
 //            isRunning ? testEvent.start() : testEvent.stop()
 //        }
 //    }
-
+    let triggeredEvent: OperationGenerator
     let mainPhasor: OperationGenerator
     let sound1: OperationEffect
     let sound2: OperationEffect
@@ -43,11 +41,38 @@ class BasicEventConductor: ObservableObject {
                                              start: 0.0,
                                              end: 1.0,
                                              duration: 0.4 * parameters[1] / 1000.0)
+
             return Operation.fmOscillator(baseFrequency: 220, carrierMultiplier: 1, modulatingMultiplier: 1, modulationIndex: 1, amplitude: min(line, 1 - line))
         }
         mainPhasor = OperationGenerator { parameters in
             let ms = parameters[0] // total score time ms
             return Operation.phasor(frequency: 1000 / ms, phase: 0.0)
+        }
+
+        triggeredEvent = OperationGenerator { parameters in
+            // parameters: 0-trigger, 1-relative x2, 2-duration ms, 3-midiNote
+            let x = Operation.lineSegment(trigger: parameters[0],
+                                          start: 0.0,
+                                          end: 1.0,
+                                          duration: parameters[2] / 1000.0)
+            let midiNote = parameters[3] * 12 + 48
+            let frequency = midiNote.midiNoteToFrequency()
+            let ms = parameters[2]
+            let aMin = 10.0 // minimum attack time ms
+            let rMin = 10.0 // minimum release time ms
+            let d21 = min(0.5, aMin / ms) // safe attack period
+            let d32 = min(0.5, rMin / ms) // safe release period
+            let x2 = max(1 - d32, min(d21, parameters[1]))
+
+            let rampUp = x / x2
+            let rampDown = (1 - x) / (1 - x2)
+
+            let rampUpDown = min(rampUp, rampDown)
+            let topClip = min(rampUpDown, 1.0)
+            let bottomClip = max(topClip, 0.0)
+            let amplitude = bottomClip * 0.25
+
+            return Operation.fmOscillator(baseFrequency: frequency, carrierMultiplier: 1, modulatingMultiplier: 1, modulationIndex: amplitude, amplitude: amplitude * amplitude)
         }
 
         func createSound(input: OperationGenerator) -> OperationEffect {
@@ -82,7 +107,7 @@ class BasicEventConductor: ObservableObject {
                 return Operation.fmOscillator(baseFrequency: frequency, carrierMultiplier: 1, modulatingMultiplier: 1, modulationIndex: amplitude, amplitude: amplitude * amplitude)
             }
         }
-        cursor = 0
+//        cursor = 0
         sound1 = createSound(input: mainPhasor)
         sound2 = createSound(input: mainPhasor)
         testEvent.parameter1 = 1.0
@@ -218,7 +243,6 @@ struct SwiftUIView: View {
                 }
                 .onAppear {
                     conductor.isRunning.toggle()
-                    conductor.startDate = Date().timeIntervalSinceReferenceDate
                 }
             }
             .onAppear {
