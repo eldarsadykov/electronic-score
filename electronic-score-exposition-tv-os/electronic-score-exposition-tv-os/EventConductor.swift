@@ -31,18 +31,20 @@ class EventConductor: ObservableObject {
     }
 
 //    let triggeredEvent: OperationGenerator
+    let testFMArray: [FMOscillator]
     let triggeredEvents: [OperationGenerator]
     let sum: Mixer
-//    let reverb: CostelloReverb
-//    let dryWetMixer: DryWetMixer
+    let reverb: CostelloReverb
+    let dryWetMixer: DryWetMixer
     init() {
         func createSound() -> OperationGenerator {
             OperationGenerator { parameters in
+//                let x = Operation.phasor(frequency: 1, phase: 0)
                 let x = Operation.lineSegment(trigger: parameters[0],
                                               start: 0,
                                               end: 2, // excess phase to ensure that it reaches full 1
                                               duration: parameters[2] * 2 / 1000.0) // double duration to compensate double phase
-                let midiNote = parameters[3] * 24 + 60
+                let midiNote = parameters[3] * 36 + 60
                 let frequency = midiNote.midiNoteToFrequency()
                 let ms = parameters[2]
                 let aMin = 10.0 // minimum attack time ms
@@ -61,6 +63,13 @@ class EventConductor: ObservableObject {
                 return Operation.fmOscillator(baseFrequency: frequency, carrierMultiplier: 1, modulatingMultiplier: 1, modulationIndex: amplitude, amplitude: amplitude * amplitude)
             }
         }
+        func testFM(freq: AUValue, amp: AUValue) -> FMOscillator {
+            FMOscillator(baseFrequency: freq, carrierMultiplier: 1, modulatingMultiplier: 1, modulationIndex: 1, amplitude: amp)
+        }
+//        let n = 50
+        testFMArray = (0 ..< 50).map { i in
+            testFM(freq: AUValue(i) * 55.0, amp: 1.0 / AUValue((i + 1) * 50))
+        }
         triggeredEvents = (0 ..< score.count).map { _ in
             createSound()
         }
@@ -71,11 +80,12 @@ class EventConductor: ObservableObject {
             triggeredEvents[i].parameter4 = AUValue(incircleParams(score[i], width: 1, height: 1)[1])
         }
         sum = Mixer(triggeredEvents)
-//        reverb = CostelloReverb(sum, feedback: 0.8, cutoffFrequency: 10000)
-//        dryWetMixer = DryWetMixer(sum, reverb)
-//        dryWetMixer.balance = 0.25
+        reverb = CostelloReverb(sum, feedback: 0.8, cutoffFrequency: 10000)
+        dryWetMixer = DryWetMixer(sum, reverb)
+        dryWetMixer.balance = 0.25
+
 //        mix.volume = 1.0 / AUValue(triggeredEvents.count)
-        engine.output = sum
+        engine.output = dryWetMixer
 //        triggeredEvent = OperationGenerator { parameters in
 //            // parameters: 1-trigger, 2-relative x2, 3-duration ms, 4-incircle y
         ////            let x = Operation.phasor(frequency: 0.3)

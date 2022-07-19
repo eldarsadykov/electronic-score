@@ -112,18 +112,18 @@ struct MainView: View {
                             if onTime == offTime {
                                 if counter == Int(score[i][1] * Double(counterMax - 1)) {
                                     playState[i] = true
-                                    withAnimation(.easeOut(duration: offDuration)) {
+                                    withAnimation(.easeInOut(duration: offDuration)) {
                                         playState[i] = false
                                     }
                                 }
                             } else {
                                 if counter == Int(score[i][0] * Double(counterMax - 1)) {
-                                    withAnimation(.easeOut(duration: onDuration)) {
+                                    withAnimation(.easeInOut(duration: onDuration)) {
                                         playState[i] = true
                                     }
                                 }
                                 if counter == Int(score[i][1] * Double(counterMax - 1)) {
-                                    withAnimation(.easeOut(duration: offDuration)) {
+                                    withAnimation(.easeInOut(duration: offDuration)) {
                                         playState[i] = false
                                     }
                                 }

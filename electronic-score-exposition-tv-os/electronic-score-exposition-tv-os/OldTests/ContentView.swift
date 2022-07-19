@@ -130,7 +130,7 @@ struct ContentView: View {
                         .onDisappear {
                             oscobj.stop()
                         }
-                        .focusable()
+//                        .focusable()
                     Rectangle()
                         .foregroundColor(Color.red)
                         .frame(width: baseWidth * 4)
