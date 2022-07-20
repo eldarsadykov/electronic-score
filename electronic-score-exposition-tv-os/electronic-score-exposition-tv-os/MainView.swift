@@ -14,7 +14,7 @@ import Sporth
 import SporthAudioKit
 import SwiftUI
 
-let score = [[0, 0, 0.5, 0.5, 1, 0.75],
+let score = [[0, 0.25, 0.5, 0.5, 1, 0.75],
              [0, 0.5, 0.5, 1, 1, 0.75],
              [0, 0.5, 0.5, 0.5, 0.75, 0.25],
              [0.5, 0.5, 1, 1, 0.25, 0],
@@ -41,6 +41,10 @@ struct MainView: View {
                     .opacity(0.25)
                 // CONTENT
                 ForEach(0 ..< score.count, id: \.self) { i in
+//                    let onTime = Int(score[i][0] * totalTime)
+//                    let offTime = Int(score[i][1] * totalTime)
+//                    let onDuration: Double = (score[i][1] - score[i][0]) * totalTime
+//                    let offDuration: Double = (score[i][2] - score[i][1]) * totalTime
                     let scale = playState[i] ? 1.0 : 0
                     let incircle = incircleParams(score[i], width: geo.size.width, height: geo.size.height)
                     TriangleFramed(x: (score[i][1] - score[i][0]) / (score[i][2] - score[i][0]),
@@ -57,6 +61,30 @@ struct MainView: View {
                                 y: -triangleOffset(dim: geo.size.height,
                                                    dimMin: min(score[i][3], score[i][4], score[i][5]),
                                                    dimMax: max(score[i][3], score[i][4], score[i][5])))
+//                        .onTapGesture {
+//
+//                            playState[i].toggle()
+//                            print("\(i): \(playState[i])")
+//                            conductor.triggeredEvents[i].parameter1 = AUValue(scale)
+//                            if onTime == offTime {
+//                                if playState[i] {
+//                                    withAnimation(.easeInOut(duration: offDuration)) {
+//                                        playState[i] = false
+//                                    }
+//                                }
+//                            } else {
+//                                if counter == Int(score[i][0] * Double(counterMax - 1)) {
+//                                    withAnimation(.easeInOut(duration: onDuration)) {
+//                                        playState[i] = true
+//                                    }
+//                                }
+//                                if counter == Int(score[i][1] * Double(counterMax - 1)) {
+//                                    withAnimation(.easeInOut(duration: offDuration)) {
+//                                        playState[i] = false
+//                                    }
+//                                }
+//                            }
+//                        }
                     TriangleFramed(x: (score[i][1] - score[i][0]) / (score[i][2] - score[i][0]),
                                    y1: triangleCoordY(y: score[i][3], y1: score[i][3], y2: score[i][4], y3: score[i][5]),
                                    y2: triangleCoordY(y: score[i][4], y1: score[i][3], y2: score[i][4], y3: score[i][5]),
@@ -86,8 +114,7 @@ struct MainView: View {
                 // FOREGROUND
                 Playhead()
                     .stroke(style: StrokeStyle(lineWidth: 8, lineCap: .butt))
-                    .foregroundColor(Color.green)
-                    .opacity(0)
+                    .opacity(0.5)
                     .onAppear {
                         self.conductor.start()
                         conductor.isRunning.toggle()
@@ -96,7 +123,7 @@ struct MainView: View {
                         self.conductor.stop()
                     }
                     .onReceive(timer) { _ in
-                        self.counter += 1
+//                        self.counter += 1
                         self.counter %= counterMax
                         for i in 0 ..< score.count {
                             let onTime = Int(score[i][0] * totalTime)
@@ -133,6 +160,9 @@ struct MainView: View {
                     .offset(x: cursorOffsetCalc(counter, width: geo.size.width, max: counterMax))
             }
         }
+        .padding(50.0)
+        .ignoresSafeArea()
+
     }
 }
 
