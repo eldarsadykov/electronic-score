@@ -10,7 +10,7 @@
 		}
 ,
 		"classnamespace" : "box",
-		"rect" : [ 1036.0, 217.0, 640.0, 480.0 ],
+		"rect" : [ 588.0, 507.0, 1279.0, 680.0 ],
 		"bglocked" : 0,
 		"openinpresentation" : 0,
 		"default_fontsize" : 12.0,
@@ -38,19 +38,7 @@
 		"style" : "",
 		"subpatcher_template" : "",
 		"assistshowspatchername" : 0,
-		"boxes" : [ 			{
-				"box" : 				{
-					"id" : "obj-1",
-					"maxclass" : "newobj",
-					"numinlets" : 2,
-					"numoutlets" : 1,
-					"outlettype" : [ "signal" ],
-					"patching_rect" : [ 170.0, 93.0, 43.0, 22.0 ],
-					"text" : "cycle~"
-				}
-
-			}
- ],
+		"boxes" : [  ],
 		"lines" : [  ],
 		"dependency_cache" : [  ],
 		"autosave" : 0
