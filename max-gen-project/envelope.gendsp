@@ -1,0 +1,109 @@
+{
+	"patcher" : 	{
+		"fileversion" : 1,
+		"appversion" : 		{
+			"major" : 8,
+			"minor" : 3,
+			"revision" : 1,
+			"architecture" : "x64",
+			"modernui" : 1
+		}
+,
+		"classnamespace" : "dsp.gen",
+		"rect" : [ 754.0, 86.0, 652.0, 779.0 ],
+		"bglocked" : 0,
+		"openinpresentation" : 0,
+		"default_fontsize" : 12.0,
+		"default_fontface" : 0,
+		"default_fontname" : "Arial",
+		"gridonopen" : 1,
+		"gridsize" : [ 15.0, 15.0 ],
+		"gridsnaponopen" : 1,
+		"objectsnaponopen" : 1,
+		"statusbarvisible" : 2,
+		"toolbarvisible" : 1,
+		"lefttoolbarpinned" : 0,
+		"toptoolbarpinned" : 0,
+		"righttoolbarpinned" : 0,
+		"bottomtoolbarpinned" : 0,
+		"toolbars_unpinned_last_save" : 0,
+		"tallnewobj" : 0,
+		"boxanimatetime" : 200,
+		"enablehscroll" : 1,
+		"enablevscroll" : 1,
+		"devicewidth" : 0.0,
+		"description" : "",
+		"digest" : "",
+		"tags" : "",
+		"style" : "",
+		"subpatcher_template" : "",
+		"assistshowspatchername" : 0,
+		"boxes" : [ 			{
+				"box" : 				{
+					"id" : "obj-2",
+					"maxclass" : "newobj",
+					"numinlets" : 0,
+					"numoutlets" : 1,
+					"outlettype" : [ "" ],
+					"patching_rect" : [ 302.0, 24.0, 145.0, 22.0 ],
+					"text" : "Param ms @default 1000"
+				}
+
+			}
+, 			{
+				"box" : 				{
+					"code" : "x = in1; // current phase (0-1)\r\n\r\naMin = 5; // minimum attack time ms\r\nrMin = 5; // minimum release time ms\r\n\r\nx01 = 0.1; // note start time \r\nx02 = 0.9; // note peak time\r\nx03 = 0.9; // note end time\r\n\r\nd21 = min(0.5, aMin / ms); // safe attack period\r\nd32 = min(0.5, rMin / ms); // safe release period\r\nd31 = d21 + d32; // safeNoteLength\r\n\r\nx1 = max(0, min(x01, 1 - d31)); // protect start\r\nx3 = min(1, max(x03, x1 + d31)); // protect end\r\nx2 = x1 + min(x3 - x1 - d32, max(x02 - x1, d21)); // protect middle\r\n\r\nrampUp = (x - x1) / (x2 - x1);\r\nrampDown = 1 - (x - x2) / (x3 - x2);\r\n\r\nrampUpDown = min(rampUp,rampDown);\r\ntopClip = min(rampUpDown,1);\r\nbottomClip = max(topClip, 0);\r\namplitude = bottomClip;\r\n\r\n\r\nout1 = amplitude;",
+					"fontface" : 0,
+					"fontname" : "<Monospaced>",
+					"fontsize" : 12.0,
+					"id" : "obj-5",
+					"maxclass" : "codebox",
+					"numinlets" : 1,
+					"numoutlets" : 1,
+					"outlettype" : [ "" ],
+					"patching_rect" : [ 50.0, 74.0, 532.0, 482.0 ]
+				}
+
+			}
+, 			{
+				"box" : 				{
+					"id" : "obj-1",
+					"maxclass" : "newobj",
+					"numinlets" : 0,
+					"numoutlets" : 1,
+					"outlettype" : [ "" ],
+					"patching_rect" : [ 50.0, 14.0, 28.0, 22.0 ],
+					"text" : "in 1"
+				}
+
+			}
+, 			{
+				"box" : 				{
+					"id" : "obj-4",
+					"maxclass" : "newobj",
+					"numinlets" : 1,
+					"numoutlets" : 0,
+					"patching_rect" : [ 50.0, 690.0, 35.0, 22.0 ],
+					"text" : "out 1"
+				}
+
+			}
+ ],
+		"lines" : [ 			{
+				"patchline" : 				{
+					"destination" : [ "obj-5", 0 ],
+					"source" : [ "obj-1", 0 ]
+				}
+
+			}
+, 			{
+				"patchline" : 				{
+					"destination" : [ "obj-4", 0 ],
+					"source" : [ "obj-5", 0 ]
+				}
+
+			}
+ ]
+	}
+
+}
