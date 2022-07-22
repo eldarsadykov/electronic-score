@@ -10,7 +10,7 @@
 		}
 ,
 		"classnamespace" : "dsp.gen",
-		"rect" : [ 1314.0, 87.0, 628.0, 1319.0 ],
+		"rect" : [ 1314.0, 86.0, 629.0, 1319.0 ],
 		"bglocked" : 0,
 		"openinpresentation" : 0,
 		"default_fontsize" : 12.0,
@@ -40,7 +40,7 @@
 		"assistshowspatchername" : 0,
 		"boxes" : [ 			{
 				"box" : 				{
-					"code" : "protect(x01,x02,x03,aMin,rMin,ms) {\r\n\t\r\n\td21 = min(0.5, aMin / ms); // safe attack period\r\n\td32 = min(0.5, rMin / ms); // safe release period\r\n\td31 = d21 + d32; // safeNoteLength\r\n\r\n\tx1 = max(0, min(x01, 1 - d31)); // protect start\r\n\tx3 = min(1, max(x03, x1 + d31)); // protect end\r\n\tx2 = x1 + min(x3 - x1 - d32, max(x02 - x1, d21)); // protect middle\r\n\t\r\n\treturn x1,x2,x3;\r\n}\r\n\r\nenvelope(x, x1, x2, x3, y1, y2, y3, aMin, rMin, ms) {\r\n\t\r\n\tamplitude = 0;\r\n\t\r\n\tif ((x >= x1) && (x <= x3)) {\r\n\r\n\t\trampUp = (x - x1) / (x2 - x1);\r\n\t\trampDown = 1 - (x - x2) / (x3 - x2);\r\n\t\trampUpDown = min(rampUp,rampDown);\r\n\t\ttopClip = min(rampUpDown,1);\r\n\t\tbottomClip = max(topClip, 0);\r\n\t\tamplitude = bottomClip;\r\n\t\r\n\t}\r\n\r\n\treturn amplitude;\r\n\r\n}\r\n\r\nBuffer score(\"score\");\r\nx = in1; // current phase (0-1)\r\naMin = 5; \r\nrMin = 5;\r\nms = 2000;\r\nsum = 0;\r\n\r\nfor(i=0; i<dim(score); i += 1) {\r\n\t\r\n\tx01, x02, x03, y1, y2, y3 = peek(score, i, 0, channels=6);\r\n\t\r\n\tx1, x2, x3 = protect(x01, x02, x03, aMin, rMin, ms);\r\n\t\r\n\ty13Middle = interp((x2 - x1) / (x3 - x1), y1, y3);\r\n\t\r\n\tnormFactor = abs(y2 - y13Middle);\r\n\t\r\n\tsum += envelope(x, x1, x2, x3, y1, y2, y3, aMin, rMin, ms)/normFactor;\r\n\r\n}\r\n\r\nout1 = sum;",
+					"code" : "protect(x01,x02,x03,aMin,rMin,ms) {\r\n\t\r\n\td21 = min(0.5, aMin / ms); // safe attack period\r\n\td32 = min(0.5, rMin / ms); // safe release period\r\n\td31 = d21 + d32; // safeNoteLength\r\n\r\n\tx1 = max(0, min(x01, 1 - d31)); // protect start\r\n\tx3 = min(1, max(x03, x1 + d31)); // protect end\r\n\tx2 = x1 + min(x3 - x1 - d32, max(x02 - x1, d21)); // protect middle\r\n\t\r\n\treturn x1,x2,x3;\r\n}\r\n\r\nenvelope(x, x1, x2, x3, y1, y2, y3, aMin, rMin, ms) {\r\n\t\r\n\tamplitude = 0;\r\n\t\r\n\tif ((x >= x1) && (x <= x3)) {\r\n\r\n\t\trampUp = (x - x1) / (x2 - x1);\r\n\t\trampDown = 1 - (x - x2) / (x3 - x2);\r\n\t\trampUpDown = min(rampUp,rampDown);\r\n\t\ttopClip = min(rampUpDown,1);\r\n\t\tbottomClip = max(topClip, 0);\r\n\t\tamplitude = bottomClip;\r\n\t\r\n\t}\r\n\r\n\treturn amplitude;\r\n\r\n}\r\n\r\nBuffer score(\"score\");\r\n\r\naMin = 5; \r\nrMin = 5;\r\nms = in1;\r\nsum = 0;\r\nx = phasor(1000/ms); // current phase (0-1)\r\n\r\nfor(i=0; i<dim(score); i += 1) {\r\n\t\r\n\tx01, x02, x03, y1, y2, y3 = peek(score, i, 0, channels=6);\r\n\t\r\n\tx1, x2, x3 = protect(x01, x02, x03, aMin, rMin, ms);\r\n\t\r\n\ty13Middle = interp((x2 - x1) / (x3 - x1), y1, y3);\r\n\t\r\n\tnormFactor = abs(y2 - y13Middle);\r\n\t\r\n\tsum += envelope(x, x1, x2, x3, y1, y2, y3, aMin, rMin, ms)/normFactor;\r\n\r\n}\r\n\r\nout1 = sum;",
 					"fontface" : 0,
 					"fontname" : "<Monospaced>",
 					"fontsize" : 12.0,
