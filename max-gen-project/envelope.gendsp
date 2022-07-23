@@ -10,7 +10,7 @@
 		}
 ,
 		"classnamespace" : "dsp.gen",
-		"rect" : [ 901.0, 53.0, 833.0, 1387.0 ],
+		"rect" : [ 929.0, 87.0, 927.0, 1319.0 ],
 		"bglocked" : 0,
 		"openinpresentation" : 0,
 		"default_fontsize" : 12.0,
@@ -52,7 +52,7 @@
 			}
 , 			{
 				"box" : 				{
-					"code" : "protect(x01,x02,x03,aMin,rMin,ms) {\r\n\t\r\n\td21 = min(0.5, aMin / ms); // safe attack period\r\n\td32 = min(0.5, rMin / ms); // safe release period\r\n\td31 = d21 + d32; // safeNoteLength\r\n\r\n\tx1 = max(0, min(x01, 1 - d31)); // protect start\r\n\tx3 = min(1, max(x03, x1 + d31)); // protect end\r\n\tx2 = x1 + min(x3 - x1 - d32, max(x02 - x1, d21)); // protect middle\r\n\t\r\n\treturn x1,x2,x3;\r\n}\r\n\r\nenvelope(x, x1, x2, x3, y1, y2, y3) {\r\n\trampUp = (x - x1) / (x2 - x1);\r\n\trampDown = 1 - (x - x2) / (x3 - x2);\r\n\trampUpDown = min(rampUp,rampDown);\r\n\ttopClip = min(rampUpDown,1);\r\n\tbottomClip = max(topClip, 0);\r\n\tamplitude = bottomClip;\r\n\treturn amplitude;\r\n}\r\n\r\nBuffer score(\"score\");\r\n\r\naMin = 5; \r\nrMin = 5;\r\nx = in1;\r\nms = in2;\r\n\r\nx01, x02, x03, y1, y2, y3 = peek(score, mc_channel - 1, 0, channels=6);\r\nx1, x2, x3 = protect(x01, x02, x03, aMin, rMin, ms);\r\n\r\nenv = 0;\r\n\r\nif ((x >= x1) && (x <= x3)) {\r\n\ty13Middle = interp((x2 - x1) / (x3 - x1), y1, y3);\r\n\tnormFactor = abs(y2 - y13Middle);\r\n\tenv = envelope(x, x1, x2, x3, y1, y2, y3)/normFactor;\r\n}\r\n\r\n\r\n\r\nout1 = env * cycle(mtof(60 + 12*(mc_channel - 1)));\r\n",
+					"code" : "protect(x01,x02,x03,aMin,rMin,ms) {\r\n\t\r\n\td21 = min(0.5, aMin / ms); // safe attack period\r\n\td32 = min(0.5, rMin / ms); // safe release period\r\n\td31 = d21 + d32; // safeNoteLength\r\n\r\n\tx1 = max(0, min(x01, 1 - d31)); // protect start\r\n\tx3 = min(1, max(x03, x1 + d31)); // protect end\r\n\tx2 = x1 + min(x3 - x1 - d32, max(x02 - x1, d21)); // protect middle\r\n\t\r\n\treturn x1,x2,x3;\r\n}\r\n\r\nenvelope(x, x1, x2, x3, y1, y2, y3) {\r\n\trampUp = (x - x1) / (x2 - x1);\r\n\trampDown = 1 - (x - x2) / (x3 - x2);\r\n\trampUpDown = min(rampUp,rampDown);\r\n\ttopClip = min(rampUpDown,1);\r\n\tbottomClip = max(topClip, 0);\r\n\tamplitude = bottomClip;\r\n\treturn amplitude;\r\n}\r\n\r\nBuffer score(\"score\");\r\n\r\naMin = 5; \r\nrMin = 5;\r\nx = in1;\r\nms = in2;\r\n\r\nx01, x02, x03, y1, y2, y3 = peek(score, mc_channel - 1, 0, channels=6);\r\nx1, x2, x3 = protect(x01, x02, x03, aMin, rMin, ms);\r\n\r\nenv = 0;\r\n\r\nif ((x >= x1) && (x <= x3)) {\r\n\ty13Middle = interp((x2 - x1) / (x3 - x1), y1, y3);\r\n\tnormFactor = abs(y2 - y13Middle);\r\n\tenv = envelope(x, x1, x2, x3, y1, y2, y3)*normFactor;\r\n}\r\n\r\n\r\ncarrierFreq = mtof(60+(mc_channel-1)*12);\r\nmodulator = cycle(carrierFreq);\r\ncarrier = cycle(carrierFreq*(1+env*modulator));\r\n\r\nout1 = env * env * carrier;\r\n",
 					"fontface" : 0,
 					"fontname" : "<Monospaced>",
 					"fontsize" : 12.0,
